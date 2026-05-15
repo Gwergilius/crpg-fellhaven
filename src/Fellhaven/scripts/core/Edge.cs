@@ -52,12 +52,12 @@ public class Edge
     /// <summary>
     /// Actions to execute when traversing this edge.
     /// </summary>
-    public List<EdgeAction> Actions { get; set; } = new();
+    public List<EdgeAction> Actions { get; set; } = [];
 
     /// <summary>
     /// Custom properties for this edge.
     /// </summary>
-    public Dictionary<string, object> Properties { get; set; } = new();
+    public Dictionary<string, object> Properties { get; set; } = [];
 
     /// <summary>
     /// Evaluates whether this edge can be traversed given the current game state.

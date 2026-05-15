@@ -109,3 +109,10 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
 dotnet_naming_style.begins_with_underscore.required_prefix = _
 dotnet_naming_style.begins_with_underscore.capitalization = camel_case
+
+# Godot-specific: scripts/ folder structure doesn't match namespace convention
+# Godot requires scripts to be in scripts/core, scripts/systems etc.
+# But C# namespaces should be Fellhaven.Core, Fellhaven.Systems (not Fellhaven.Scripts.Core)
+[src/Fellhaven/scripts/**/*.cs]
+dotnet_diagnostic.IDE0130.severity = none  # Disable namespace doesn't match folder structure
+

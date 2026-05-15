@@ -4,12 +4,15 @@ namespace Fellhaven.Core;
 /// Represents a location (node) in the dungeon graph.
 /// A location is a discrete area that the player can be in.
 /// </summary>
-public class Location
+/// <remarks>
+/// Creates a new location with the specified ID.
+/// </remarks>
+public class Location(string id)
 {
     /// <summary>
     /// Unique identifier for this location.
     /// </summary>
-    public string Id { get; set; } = string.Empty;
+    public string Id { get; set; } = id;
 
     /// <summary>
     /// Localization key for the location name.
@@ -29,25 +32,17 @@ public class Location
     /// <summary>
     /// List of outgoing edges from this location.
     /// </summary>
-    public List<Edge> OutgoingEdges { get; set; } = new();
+    public List<Edge> OutgoingEdges { get; set; } = [];
 
     /// <summary>
     /// Custom properties for this location (can store any data).
     /// </summary>
-    public Dictionary<string, object> Properties { get; set; } = new();
+    public Dictionary<string, object> Properties { get; set; } = [];
 
     /// <summary>
     /// Objects/entities in this location (NPCs, items, etc.).
     /// </summary>
-    public List<LocationObject> Objects { get; set; } = new();
-
-    /// <summary>
-    /// Creates a new location with the specified ID.
-    /// </summary>
-    public Location(string id)
-    {
-        Id = id;
-    }
+    public List<LocationObject> Objects { get; set; } = [];
 
     /// <summary>
     /// Gets the first available edge in the specified direction.
@@ -101,5 +96,5 @@ public class LocationObject
     public string Id { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty; // "npc", "item", "decoration", etc.
     public string NameKey { get; set; } = string.Empty;
-    public Dictionary<string, object> Properties { get; set; } = new();
+    public Dictionary<string, object> Properties { get; set; } = [];
 }

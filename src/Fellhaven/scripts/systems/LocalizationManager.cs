@@ -13,9 +13,9 @@ public partial class LocalizationManager : Node
     /// </summary>
     public static LocalizationManager Instance => _instance!;
 
-    private Dictionary<string, Dictionary<string, string>> _translations = new();
+    private readonly Dictionary<string, Dictionary<string, string>> _translations = [];
     private string _currentLanguage = "en";
-    private const string LocalizationPath = "res://localization/";
+    private const string _localizationPath = "res://localization/";
 
     /// <summary>
     /// Gets or sets the current language code.
@@ -40,10 +40,10 @@ public partial class LocalizationManager : Node
     private void LoadTranslations()
     {
         // Load English (default/fallback)
-        LoadLanguage("en", $"{LocalizationPath}en.json");
+        LoadLanguage("en", $"{_localizationPath}en.json");
 
         // Load Hungarian
-        LoadLanguage("hu", $"{LocalizationPath}hu.json");
+        LoadLanguage("hu", $"{_localizationPath}hu.json");
 
         // Set default language
         _currentLanguage = "en";
@@ -156,7 +156,7 @@ public partial class LocalizationManager : Node
     /// </summary>
     public string[] GetAvailableLanguages()
     {
-        return _translations.Keys.ToArray();
+        return [.. _translations.Keys];
     }
 
     /// <summary>

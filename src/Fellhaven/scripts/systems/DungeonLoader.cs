@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Fellhaven.Core;
 
 namespace Fellhaven.Systems;
@@ -7,6 +8,11 @@ namespace Fellhaven.Systems;
 /// </summary>
 public static class DungeonLoader
 {
+    private static readonly JsonSerializerOptions _caseInsensitiveOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     /// <summary>
     /// Loads a dungeon from a JSON file.
     /// </summary>
@@ -30,10 +36,8 @@ public static class DungeonLoader
             }
 
             string jsonText = file.GetAsText();
-            var dungeonData = JsonSerializer.Deserialize<DungeonData>(jsonText, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+
+            var dungeonData = JsonSerializer.Deserialize<DungeonData>(jsonText, _caseInsensitiveOptions);
 
             if (dungeonData == null)
             {
@@ -170,10 +174,10 @@ internal class DungeonData
     public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("locations")]
-    public List<LocationData> Locations { get; set; } = new();
+    public List<LocationData> Locations { get; set; } = [];
 
     [JsonPropertyName("edges")]
-    public List<EdgeData> Edges { get; set; } = new();
+    public List<EdgeData> Edges { get; set; } = [];
 }
 
 internal class LocationData

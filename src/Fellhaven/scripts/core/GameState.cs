@@ -16,17 +16,17 @@ public partial class GameState : Node
     /// <summary>
     /// Global boolean flags (e.g., "door_opened", "quest_completed").
     /// </summary>
-    public Dictionary<string, bool> GlobalFlags { get; set; } = new();
+    public Dictionary<string, bool> GlobalFlags { get; set; } = [];
 
     /// <summary>
     /// Global integer variables (e.g., quest stages, counters).
     /// </summary>
-    public Dictionary<string, int> Variables { get; set; } = new();
+    public Dictionary<string, int> Variables { get; set; } = [];
 
     /// <summary>
     /// String variables (for more complex data).
     /// </summary>
-    public Dictionary<string, string> StringVariables { get; set; } = new();
+    public Dictionary<string, string> StringVariables { get; set; } = [];
 
     /// <summary>
     /// Player's current location in the dungeon.
@@ -185,7 +185,7 @@ public partial class GameState : Node
 /// </summary>
 public class Inventory
 {
-    private readonly Dictionary<string, int> _items = new();
+    private readonly Dictionary<string, int> _items = [];
 
     /// <summary>
     /// Checks if the inventory contains at least one of an item.
@@ -265,7 +265,7 @@ public class Inventory
 /// </summary>
 public class Party
 {
-    public List<Character> Members { get; set; } = new();
+    public List<Character> Members { get; set; } = [];
 
     /// <summary>
     /// Checks if any party member has the specified class.
@@ -308,8 +308,8 @@ public class Character
     public int CurrentMP { get; set; } = 50;
     public int MaxMP { get; set; } = 50;
 
-    public Dictionary<string, int> Skills { get; set; } = new();
-    public Dictionary<string, int> Attributes { get; set; } = new();
+    public Dictionary<string, int> Skills { get; set; } = [];
+    public Dictionary<string, int> Attributes { get; set; } = [];
 
     public int GetSkillLevel(string skillName)
     {
