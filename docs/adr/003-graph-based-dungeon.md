@@ -1,8 +1,8 @@
-[adr-001]: 001-engine-choice.md "Engine Choice"
-[adr-002]: 002-platform-strategy.md "Multi-Platform Development Strategy"
-[adr-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
-[adr-005]: 005-lua-scripting.md "Event-Action System with Lua Scripting"
-[adr-006]: 006-localization.md "Internationalization Strategy"
+[ADR-001]: 001-engine-choice.md "Engine Choice"
+[ADR-002]: 002-platform-strategy.md "Multi-Platform Development Strategy"
+[ADR-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
+[ADR-005]: 005-lua-scripting.md "Event-Action System with Lua Scripting"
+[ADR-006]: 006-localization.md "Internationalization Strategy"
 
 # ADR-003: World Data Model — Directed Graph / Finite State Machine
 
@@ -116,7 +116,7 @@ A region is a named grouping of nodes for rendering and data management purposes
 | Property | Type | Description |
 |---|---|---|
 | `id` | `string` | Unique identifier, e.g. `"fellhaven_town"` |
-| `name_key` | `string` | i18n key for the display name ([ADR-005][adr-005]) |
+| `name_key` | `string` | i18n key for the display name ([ADR-006]) |
 | `type` | `RegionType` | `town` \| `dungeon` \| `outdoor` \| `special` |
 | `width`, `height` | `int` | Grid dimensions (typically ≤ 16×16) |
 | `texture_set` | `string` | Default wall/floor/ceiling texture set |
@@ -624,7 +624,7 @@ This is the same reason `edge_overrides` exists: edge state (open/locked) can ch
 player, so it's stored in `save.db`, not as a mutable property in `world.db`.
 
 **Multi-user deployment**: This architecture naturally extends to **server-based/web deployment**
-scenarios ([ADR-002][adr-002]). A single `world.db` instance on the server can serve multiple
+scenarios ([ADR-002]). A single `world.db` instance on the server can serve multiple
 concurrent players, each with their own `save.db`. The server maintains:
 - **One canonical world.db** (read-only, shared by all players)
 - **Per-player save.db files** (isolated, player-specific progress)
@@ -749,11 +749,11 @@ Model every possible game state as a node, with no region/grid structure at all.
 
 ## Related ADRs
 
-- [ADR-001][adr-001]: Engine Choice
-- [ADR-002][adr-002]: Platform Strategy
-- [ADR-004][adr-004]: Condition Vocabulary and Combat System (condition/formula evaluation)
-- [ADR-005][adr-005]: Event-Action System with Lua Scripting (two-tier action vocabulary)
-- [ADR-006][adr-006]: Localization System (name_key fields)
+- [ADR-001]: Engine Choice
+- [ADR-002]: Platform Strategy
+- [ADR-004]: Condition Vocabulary and Combat System (condition/formula evaluation)
+- [ADR-005]: Event-Action System with Lua Scripting (two-tier action vocabulary)
+- [ADR-006]: Localization System (name_key fields)
 
 ---
 
