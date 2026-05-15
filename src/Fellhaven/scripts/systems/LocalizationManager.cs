@@ -1,10 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using Godot;
-using GodotFileAccess = Godot.FileAccess;
-
 namespace Fellhaven.Systems;
 
 /// <summary>
@@ -61,7 +54,7 @@ public partial class LocalizationManager : Node
     /// </summary>
     private void LoadLanguage(string langCode, string filePath)
     {
-        if (!GodotFileAccess.FileExists(filePath))
+        if (!Godot.FileAccess.FileExists(filePath))
         {
             GD.PrintErr($"[LocalizationManager] Translation file not found: {filePath}");
             return;
@@ -69,7 +62,7 @@ public partial class LocalizationManager : Node
 
         try
         {
-            using var file = GodotFileAccess.Open(filePath, GodotFileAccess.ModeFlags.Read);
+            using var file = Godot.FileAccess.Open(filePath, Godot.FileAccess.ModeFlags.Read);
             if (file == null)
             {
                 GD.PrintErr($"[LocalizationManager] Failed to open: {filePath}");

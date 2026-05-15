@@ -1,5 +1,3 @@
-using System;
-using Godot;
 using MoonSharp.Interpreter;
 using LuaScript = MoonSharp.Interpreter.Script;
 
