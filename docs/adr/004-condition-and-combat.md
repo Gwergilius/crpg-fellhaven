@@ -460,7 +460,6 @@ This is structurally identical to `stat_check`. Combat adds only:
 
 ## References
 
-- Inspired by MM1-Remaster ADR-011 Condition Vocabulary and Combat System
 - Dice notation: https://en.wikipedia.org/wiki/Dice_notation
 - Boolean logic: https://en.wikipedia.org/wiki/Boolean_algebra
 

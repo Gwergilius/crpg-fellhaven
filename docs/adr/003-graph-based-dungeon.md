@@ -88,7 +88,7 @@ transitions such as stairs, portals, or game-state transitions (death, victory).
 | `id` | `string` | Unique within the source node, e.g. `"dungeon_entrance:3:5:north"` |
 | `from` | `NodeId` | Source node (navigational property; implicit in YAML via nesting) |
 | `to` | `NodeId` | Destination node. **For solid walls, `to == from` (self-loop)** |
-| `direction` | `Direction?` | `north` \| `east` \| `south` \| `west` \| `up` \| `down` \| `null` (non-spatial) |
+| `labels` | `string \| string[] \| null` | Activation tags: `"north"`, `["north", "up"]`, `"item:key"`, `"spell:teleport"`, `"script:puzzle"`, `null` (fallback) |
 | `state` | `EdgeState` | `open` \| `closed` \| `locked` \| `secret` \| `one_way` \| `solid` |
 | `wall_visuals` | `object?` | State-keyed texture map for this wall face |
 | `condition` | `Condition?` | Gate check — blocks traversal entirely if it fails |
@@ -100,14 +100,50 @@ The **condition** and **on_traverse** are separate concerns:
 - `condition` is a **gate**: evaluated first. If it fails, traversal is blocked.
 - `on_traverse` is a **conditional action chain**: ordered list of `{ condition, action }` entries. First matching entry fires.
 
-Navigation works as follows:
-1. Player chooses a direction to move
-2. System finds all edges from current node in that direction
-3. For each edge (in definition order):
+#### Edge Labels
+
+Edges are **activated by labels** rather than just spatial directions. A label can be:
+
+| Label Format | Description | Example |
+|---|---|---|
+| `"north"`, `"east"`, `"south"`, `"west"` | Cardinal directions (spatial movement) | Player moves north |
+| `"up"`, `"down"` | Vertical movement (stairs, ladders) | Player climbs up |
+| `"item:<id>"` | Activated when player uses item | `"item:magic_orb"` teleports if orb is used |
+| `"spell:<id>"` | Activated when player casts spell | `"spell:passwall"` creates temporary passage |
+| `"member:<class>"` | Activated when party has class member | `"member:thief"` allows lockpick attempt |
+| `"script:<id>"` | Script-controlled activation (non-player) | `"script:forced_teleport"` for cutscenes |
+| `null` or `[]` | **Fallback edge** — activates when no labeled edge matches | Default "you can't go that way" response |
+
+An edge may have:
+- **Single label**: `labels: "north"` (string) — common case
+- **Multiple labels**: `labels: ["north", "up"]` (array) — edge activates via north wall OR climbing action
+- **No label**: `labels: null` or `labels: []` — fallback edge when no other edge matches
+
+**Navigation logic**:
+1. Player initiates an action (move direction, use item, cast spell, etc.) — this selects a **target label**
+2. System finds all edges from current node with a matching label in their `labels` array
+3. For each matching edge (in definition order):
    - Evaluate edge's `condition` gate — if false, skip to next edge
    - If condition passes, execute first matching `on_traverse` entry
-   - Move player to `to` node
-4. If no edge condition passes, movement fails
+   - Move player to `to` node (transition succeeds)
+4. If no labeled edge matches or all conditions fail:
+   - Find edges with `labels: null` or `labels: []` (fallback edges)
+   - Process fallback edges same as above (condition → traverse → move)
+5. If no edge activates (no match + no fallback), action fails
+
+**Example**: Player uses `magic_orb` in a room with these edges:
+```yaml
+edges:
+  - labels: "item:magic_orb"       # Matches! Player will teleport if condition passes
+    to: distant_tower
+    condition: 'return HasItem(gameState, "magic_orb")'
+  - labels: ["north", "south"]     # Does NOT match (spatial directions, not item use)
+    to: corridor
+  - labels: null                    # Fallback — used if magic_orb edge condition fails
+    to: same_room
+    on_traverse:
+      - action: 'message: "The orb does not respond here."'
+```
 
 #### Region
 
@@ -120,7 +156,7 @@ A region is a named grouping of nodes for rendering and data management purposes
 | `type` | `RegionType` | `town` \| `dungeon` \| `outdoor` \| `special` |
 | `width`, `height` | `int` | Grid dimensions (typically ≤ 16×16) |
 | `texture_set` | `string` | Default wall/floor/ceiling texture set |
-| `default_wall_type` | `WallType` | Wall type used when direction has no explicit edge |
+| `default_wall_type` | `WallType` | Wall type used when spatial direction has no explicit edge |
 | `ambient_light` | `bool` | Whether ambient light is present (false = torch required) |
 | `default_encounter_table` | `string?` | Fallback encounter table if node has none |
 | `music_track` | `string?` | Background music asset identifier |
@@ -169,7 +205,7 @@ scene** on each player move:
 ```
 CompositeScene = f(
     current_node,          -- topology, visual, flags
-    outgoing_edges,        -- traversable directions, wall visuals
+    outgoing_edges,        -- available transitions (by label), wall visuals
     party,                 -- characters, HP/SP, inventory
     npcs_at_node,          -- all NPCs whose resolved location == current_node
     time_of_day,           -- affects NPC schedules, lighting, ambient sound
@@ -352,9 +388,9 @@ history, collaboration) while delivering the performance and reliability of SQLi
 
 > **Absent edge = solid self-loop using the region's `default_wall_type`, no behaviour.**
 > The renderer falls back to the region's `default_wall_type` (typically `wall_0`) for
-> any direction that has no explicit edge. This covers the vast majority of walls.
+> any spatial direction that has no explicit edge. This covers the vast majority of walls.
 
-Any direction that deviates from the default **must** have an explicit edge.
+Any spatial direction that deviates from the default **must** have an explicit edge.
 
 #### Solid walls as self-loops
 
@@ -398,7 +434,7 @@ nodes:
     edges:
       - id: fellhaven:8:3:north
         to: fellhaven:8:2
-        direction: north
+        labels: north
         state: open
         wall_visuals:
           default: none
@@ -455,7 +491,7 @@ CREATE TABLE edges (
     id              TEXT PRIMARY KEY,
     from_node       TEXT NOT NULL REFERENCES nodes(id),
     to_node         TEXT NOT NULL REFERENCES nodes(id),
-    direction       TEXT,
+    labels          TEXT,
     state           TEXT NOT NULL,
     wall_visuals    TEXT NOT NULL DEFAULT '{"default":"wall_0"}',
     condition       TEXT,
@@ -745,7 +781,6 @@ Model every possible game state as a node, with no region/grid structure at all.
 - Graph theory fundamentals: https://en.wikipedia.org/wiki/Graph_theory
 - M.A.G.U.S. dungeon design inspiration
 - Legend of Grimrock's grid-based system (similar but more constrained)
-- Inspired by MM1-Remaster ADR-010 World Data Model
 
 ## Related ADRs
 

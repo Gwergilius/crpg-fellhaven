@@ -1,7 +1,7 @@
-[lua-api]: ../api/lua_api.md "Lua API Reference"
-[adr-003]: 003-graph-based-dungeon.md "World Data Model"
-[adr-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
-[adr-006]: 006-localization.md "Internationalization Strategy"
+[lua_api.md]: ../api/lua_api.md "Lua API Reference"
+[ADR-003]: 003-graph-based-dungeon.md "World Data Model"
+[ADR-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
+[ADR-006]: 006-localization.md "Internationalization Strategy"
 
 # ADR-005: Event-Action System with Lua Scripting
 
@@ -11,11 +11,11 @@
 
 ## Context
 
-The dungeon graph system ([ADR-003][adr-003]) requires:
+The dungeon graph system ([ADR-003]) requires:
 - **Conditions**: When is an edge traversable? When does a combat action execute?
 - **Actions**: What happens when entering a node? Traversing an edge? Interacting with an object?
 
-ADR-004 defines a **closed condition vocabulary** for common cases (has_item, stat_check, etc.).
+[ADR-004] defines a **closed condition vocabulary** for common cases (has_item, stat_check, etc.).
 This ADR addresses the **action system** — what the game *does* in response to player choices,
 world state changes, and narrative triggers.
 
@@ -31,7 +31,7 @@ The action system must be:
 
 ### Design Tension
 
-A purely declarative action vocabulary (like ADR-004's condition vocabulary) would limit
+A purely declarative action vocabulary (like [ADR-004]'s condition vocabulary) would limit
 expressiveness. Complex multi-step interactions — unique puzzles, branching NPC dialogues,
 conditional item trades — require imperative logic that a fixed schema cannot anticipate.
 
@@ -50,7 +50,7 @@ A closed, pre-compiled set of action types covering the most common Fellhaven ev
 Each action type is a named C# handler class registered in `EventDispatcher.cs`.
 Actions receive parameters from YAML/JSON via a dictionary.
 
-All text parameters are **string keys** resolved via the i18n system ([ADR-006][adr-006]) —
+All text parameters are **string keys** resolved via the i18n system ([ADR-006]) —
 no inline text in action parameters.
 
 ### Tier 2 — Lua Escape Hatch (`execute_script`)
@@ -66,27 +66,23 @@ The Lua environment is **sandboxed**: scripts can only call an explicit, limited
 surface exposed by the game. They cannot access the file system, network, or game internals
 beyond what is intentionally exposed.
 
-The Lua environment is **sandboxed**: scripts can only call an explicit, limited API
-surface exposed by the game. They cannot access the file system, network, or game internals
-beyond what is intentionally exposed.
-
 ## Action Vocabulary (Tier 1)
 
 Common action types implemented as C# handlers:
 
 | Action type | Parameters | Description |
 |---|---|---|
-| `message` | `text_key` | Display a message (sign, inscription, NPC line) |
+| `show_message` | `text_key` | Display a message (sign, inscription, NPC line) |
 | `enter_location` | `location_ref` | Enter a named location (inn, shop, temple, guild) |
-| `trap` | `type`, `damage_formula` | Trigger a trap (pit, poison gas, blade). Uses ADR-004 formula syntax. |
+| `trigger_trap` | `type`, `damage_formula` | Trigger a trap (pit, poison gas, blade). Uses ADR-004 formula syntax. |
 | `set_edge_state` | `edge_id`, `state` | Open/close/lock a secret door, drawbridge, or gate. States: `open`, `closed`, `locked`. |
-| `forced_encounter` | `monster_group` | Initiate unavoidable combat |
-| `shrine` | `deity`, `effect` | Shrine interaction (stat buff, HP restore, blessing) |
+| `force_encounter` | `monster_group` | Initiate unavoidable combat |
+| `use_shrine` | `deity`, `effect` | Shrine interaction (stat buff, HP restore, blessing) |
 | `give_item` | `item_id`, `quantity` | Place item(s) into party inventory |
 | `remove_item` | `item_id`, `quantity` | Remove item(s) from party inventory |
 | `require_item` | `item_id`, `on_success`, `on_fail` | Gate: proceed only if party has item |
-| `item_trade` | `npc_text_key`, `give`, `receive`, `success_key`, `fail_key` | Exchange items/gold with NPC |
-| `darkness_zone` | `radius` | Mark area as requiring a light source |
+| `trade_item` | `npc_text_key`, `give`, `receive`, `success_key`, `fail_key` | Exchange items/gold with NPC |
+| `set_darkness_zone` | `radius` | Mark area as requiring a light source |
 | `set_flag` | `flag_id`, `value` | Set a global or dungeon-local boolean flag |
 | `check_flag` | `flag_id`, `on_true`, `on_false` | Branch on a flag value (executes nested action chains) |
 | `play_sound` | `sound_id` | Play a sound effect or music track |
@@ -95,26 +91,26 @@ Common action types implemented as C# handlers:
 | `execute_script` | `package` | Run a Lua script package (Tier 2 — see below) |
 
 > **Note**: Cross-region transitions (map changes, teleporters) are **not actions** — they are
-> edges in the world graph (see [ADR-003][adr-003]). An edge with `direction: null` represents
+> edges in the world graph (see [ADR-003]). An edge with `direction: null` represents
 > a teleporter pad; edges with `to` in a different region are cross-region transitions.
 
 New action types can be added to the vocabulary in future phases without breaking existing
 data files (unrecognised types are logged and skipped).
 
-### Example: item_trade action
+### Example: trade_item action
 
 ```yaml
-- type: item_trade
+- type: trade_item
   params:
-    npc_text_key: sorpigal.trader.rope_for_key.prompt
+    npc_text_key: fellhaven.trader.rope_for_key.prompt
     give:
       item_id: rope
       quantity: 3
     receive:
       item_id: magic_key
       quantity: 1
-    success_key: sorpigal.trader.rope_for_key.success
-    fail_key: sorpigal.trader.rope_for_key.fail
+    success_key: fellhaven.trader.rope_for_key.success
+    fail_key: fellhaven.trader.rope_for_key.fail
 ```
 
 All `*_key` parameters resolve via the i18n system — no inline text in action definitions.
@@ -124,7 +120,7 @@ All `*_key` parameters resolve via the i18n system — no inline text in action 
 ### Script Packages
 
 Each Lua script is distributed as a **ZIP package** containing the logic file and all
-language files. See [ADR-006][adr-006] for the full package format specification.
+language files. See [ADR-006] for the full package format specification.
 
 ```
 assets/scripts/events/trader_rope_key.zip
@@ -403,9 +399,8 @@ action:
 **Description**: Node-based editor (like Unreal Blueprints or Unity Visual Scripting).
 
 **Pros**:
-- No coding required (theoretically)
 - Visual representation of logic
-- Can be more intuitive for non-programmers
+- Can be more intuitive for designers familiar with node-based tools
 
 **Cons**:
 - Requires significant tooling development
@@ -489,7 +484,7 @@ DynValue result = coroutine.Coroutine.Resume();
 
 ### Sandboxed API Implementation
 
-See [lua_api.md][lua-api] for complete API reference. Each API namespace (`party`, `world`,
+See [lua_api.md] for complete API reference. Each API namespace (`party`, `world`,
 `game`) is a separate C# class exposing only the intended methods via MoonSharp's `UserData`
 registration.
 
@@ -518,15 +513,14 @@ Create unit tests for:
 - MoonSharp: http://www.moonsharp.org/
 - Lua 5.2 Reference: https://www.lua.org/manual/5.2/
 - "Programming in Lua" book: https://www.lua.org/pil/
-- Inspired by MM1-Remaster ADR-007 Event-Action System
 
 ## Related ADRs
 
-- [ADR-003][adr-003]: World Data Model — defines where actions appear (node `on_enter`,
+- [ADR-003]: World Data Model — defines where actions appear (node `on_enter`,
   edge `on_traverse`, etc.)
-- [ADR-004][adr-004]: Condition Vocabulary and Combat System — closed condition types
+- [ADR-004]: Condition Vocabulary and Combat System — closed condition types
   complement this ADR's closed action types
-- [ADR-006][adr-006]: Localization System — script packages use `.i18` files for text
+- [ADR-006]: Localization System — script packages use `.i18` files for text
 
 ---
 
