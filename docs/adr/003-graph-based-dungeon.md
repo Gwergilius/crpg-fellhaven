@@ -1,7 +1,7 @@
 [adr-001]: 001-engine-choice.md "Engine Choice"
 [adr-002]: 002-platform-strategy.md "Multi-Platform Development Strategy"
 [adr-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
-[adr-005]: 005-lua-scripting.md "Lua Scripting for Conditions and Actions"
+[adr-005]: 005-lua-scripting.md "Event-Action System with Lua Scripting"
 [adr-006]: 006-localization.md "Internationalization Strategy"
 
 # ADR-003: World Data Model — Directed Graph / Finite State Machine
@@ -752,7 +752,7 @@ Model every possible game state as a node, with no region/grid structure at all.
 - [ADR-001][adr-001]: Engine Choice
 - [ADR-002][adr-002]: Platform Strategy
 - [ADR-004][adr-004]: Condition Vocabulary and Combat System (condition/formula evaluation)
-- [ADR-005][adr-005]: Lua Scripting Integration (conditions/actions on edges)
+- [ADR-005][adr-005]: Event-Action System with Lua Scripting (two-tier action vocabulary)
 - [ADR-006][adr-006]: Localization System (name_key fields)
 
 ---

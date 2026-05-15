@@ -1,5 +1,5 @@
 [adr-003]: 003-graph-based-dungeon.md "World Data Model"
-[adr-005]: 005-lua-scripting.md "Lua Scripting for Conditions and Actions"
+[adr-005]: 005-lua-scripting.md "Event-Action System with Lua Scripting"
 
 # ADR-004: Condition Vocabulary and Combat System
 
@@ -455,8 +455,8 @@ This is structurally identical to `stat_check`. Combat adds only:
 
 - [ADR-003][adr-003]: World Data Model — defines where `Condition` objects appear
   (edge gates, TraverseEntry selectors, node `on_enter` selectors)
-- [ADR-005][adr-005]: Lua Scripting — Lua script evaluation used for Tier 2 `script` conditions
-  and complex combat actions
+- [ADR-005][adr-005]: Event-Action System with Lua Scripting — Lua script evaluation used for
+  Tier 2 `script` conditions and `execute_script` actions
 
 ## References
 

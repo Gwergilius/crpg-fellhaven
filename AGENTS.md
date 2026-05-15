@@ -4,7 +4,7 @@
 [adr-002]: docs/adr/002-platform-strategy.md "Multi-Platform Development Strategy"
 [adr-003]: docs/adr/003-graph-based-dungeon.md "Graph-Based Dungeon Model"
 [adr-004]: docs/adr/004-condition-and-combat.md "Condition Vocabulary and Combat System"
-[adr-005]: docs/adr/005-lua-scripting.md "Lua Scripting for Conditions and Actions"
+[adr-005]: docs/adr/005-lua-scripting.md "Event-Action System with Lua Scripting"
 [adr-006]: docs/adr/006-localization.md "Internationalization Strategy"
 [location]: src/Fellhaven/scripts/core/Location.cs
 [edge]: src/Fellhaven/scripts/core/Edge.cs
@@ -64,11 +64,13 @@ dotnet test
 - Subject/quantifier system: `party`, `party.any`, `party.all`, `ally`, `enemy`, etc.
 - Logical connectives: `and`, `or`, `not` for composing conditions
 
-**Lua Scripting** (see [ADR-005][adr-005]):
-- All game logic (conditions, actions) runs in **MoonSharp** (Lua 5.2)
-- **No recompilation needed** for gameplay changes—edit YAML/JSON source files only
-- Conditions return `bool`, actions modify GameState
-- **Fail-safe**: Lua errors return `false` (deny access), logged but don't crash
+**Event-Action System** (see [ADR-005][adr-005]):
+- **Tier 1**: Finite action vocabulary (C# handlers) for common events
+- **Tier 2**: Lua escape hatch (`execute_script`) for unique puzzles and mods
+- **MoonSharp** (Lua 5.2) for sandboxed scripting
+- **Script-first pattern**: Prototype in Lua, promote to C# if common
+- **No recompilation needed** for content changes—edit YAML/JSON source files only
+- **Fail-safe**: Lua errors logged but don't crash the game
 
 **Localization** (see [ADR-006][adr-006]):
 - Key-based system with JSON files: `localization/en.json`, `localization/hu.json`

@@ -4,7 +4,7 @@
 [adr-002]: ../adr/002-platform-strategy.md
 [adr-003]: ../adr/003-graph-based-dungeon.md
 [adr-004]: ../adr/004-condition-and-combat.md
-[adr-005]: ../adr/005-lua-scripting.md
+[adr-005]: ../adr/005-lua-scripting.md "Event-Action System with Lua Scripting"
 [adr-006]: ../adr/006-localization.md
 [adr-index]: ../adr/
 

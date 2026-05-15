@@ -1,6 +1,6 @@
-[adr-004]: 004-lua-scripting.md "Lua Scripting for Conditions and Actions"
+[adr-005]: 005-lua-scripting.md "Event-Action System with Lua Scripting"
 
-# ADR-005: Internationalization (i18n) Strategy
+# ADR-006: Internationalization (i18n) Strategy
 
 **Status**: Accepted
 
