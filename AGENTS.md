@@ -59,7 +59,7 @@ dotnet test
 
 **Lua Scripting** (see [ADR-004][adr-004]):
 - All game logic (conditions, actions) runs in **MoonSharp** (Lua 5.2)
-- **No recompilation needed** for gameplay changes—edit JSON dungeons only
+- **No recompilation needed** for gameplay changes—edit YAML/JSON source files only
 - Conditions return `bool`, actions modify GameState
 - **Fail-safe**: Lua errors return `false` (deny access), logged but don't crash
 
@@ -75,7 +75,7 @@ dotnet test
 | [GameState][gamestate] | Godot Singleton | Global flags, variables, inventory, party management |
 | [LocalizationManager][localizationmanager] | Godot Singleton | Translation lookups via `Tr(key)`, runtime language switching |
 | [LuaScriptEngine][luascriptengine] | Static Utility | Lua condition/action evaluation via MoonSharp |
-| [DungeonLoader][dungeonloader] | Static Utility | JSON deserialization into Location/Edge graph |
+| [DungeonLoader][dungeonloader] | Static Utility | YAML/JSON deserialization into Location/Edge graph |
 | [Direction][direction] | Enum + Extensions | 8 compass directions + Up/Down, with `GetOpposite()`, `ToShortString()` |
 
 ## Coding Conventions
@@ -230,18 +230,13 @@ GetPartyLevel(gameState)
 
 ### Action Execution
 All actions on an edge execute **sequentially**, each with optional condition:
-```json
-{
-  "actions": [
-    {
-      "condition_script": "return HasItem(gameState, \"key\")",
-      "action_script": "RemoveItem(gameState, \"key\", 1)\nSetFlag(gameState, \"door_unlocked\", true)"
-    },
-    {
-      "action_script": "GiveItem(gameState, \"xp\", 10)"
-    }
-  ]
-}
+```yaml
+actions:
+  - condition_script: 'return HasItem(gameState, "key")'
+    action_script: |
+      RemoveItem(gameState, "key", 1)
+      SetFlag(gameState, "door_unlocked", true)
+  - action_script: 'GiveItem(gameState, "xp", 10)'
 ```
 
 ## Git Workflow
@@ -284,7 +279,7 @@ test(dungeon): add edge condition evaluation tests
 ## Common Tasks
 
 ### Adding a New Location
-1. Edit dungeon JSON in `data/dungeons/`
+1. Edit dungeon YAML/JSON in `data/dungeons/`
 2. Add location translations to `localization/en.json`, `localization/hu.json`
 3. Define edges with `direction`, `priority`, `condition_script`, `action_script`
 4. Test with `dotnet test` (if unit testable) or in-game
@@ -315,4 +310,4 @@ This project uses **`.slnx`** (Visual Studio 2026+ XML solution format) instead 
 
 ---
 
-**Key Principle**: The dungeon graph is **data-driven**—gameplay logic lives in JSON + Lua, not hardcoded C#. When adding features, prefer extending Lua API over C# classes.
+**Key Principle**: The dungeon graph is **data-driven**—gameplay logic lives in YAML/JSON + Lua, not hardcoded C#. When adding features, prefer extending Lua API over C# classes.

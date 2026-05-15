@@ -247,15 +247,15 @@ If Attack > Defense:
 **Key Systems**:
 - Graph-based dungeon model ([ADR-001][adr-001])
 - Lua scripting for conditions/actions ([ADR-002][adr-002])
-- JSON-based localization ([ADR-003][adr-003])
+- Key-based localization ([ADR-003][adr-003])
 
 See [Architecture Decision Records][adr-index] for detailed technical decisions.
 
 ### Data Format
 
-**Dungeon Graphs**: JSON files defining locations and edges  
-**Items**: JSON database  
-**Localization**: JSON key-value pairs
+**Source Files**: YAML (preferred) or JSON for world data, items, and localization  
+**Runtime Persistence**: SQLite databases (`world.db` for static data, `save.db` for player progress)  
+**Build Pipeline**: **MazeCompiler** transforms YAML/JSON sources → SQLite databases
 
 ### Performance Targets
 

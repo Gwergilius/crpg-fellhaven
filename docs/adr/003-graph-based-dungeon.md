@@ -297,6 +297,51 @@ The constraint is a convention, not a hard limit. Content can use regions of any
 
 ## Schemas
 
+### Data Persistence Strategy
+
+The game uses **SQLite databases** for runtime persistence, not text files. This approach
+offers significant advantages:
+
+- **Performance**: Binary format is faster to load and query than text-based formats
+- **Robustness**: SQLite's ACID guarantees protect against corruption
+- **Query power**: SQL enables complex lookups and analysis without loading entire datasets
+- **Proven reliability**: SQLite is battle-tested across millions of deployments
+
+However, **YAML and JSON source files remain critical** for development and version control:
+
+#### Source-driven workflow
+
+During development, world data is authored in **YAML** (preferred) or **JSON** source files:
+
+1. **Design & Prototyping**: Authors write YAML files (easier to read/edit than JSON)
+2. **Version Control**: Text files enable meaningful diffs, branch merging, and code review
+3. **Compilation**: **MazeCompiler** tool transforms YAML/JSON sources → SQLite `world.db`
+4. **Runtime**: Game engine loads `world.db` only (fast binary access)
+
+**YAML is preferred over JSON** because it:
+- Supports comments (critical for documenting design intent)
+- Requires less syntax noise (no quotes, brackets, commas)
+- Is more human-friendly for hand-editing large data files
+
+#### Tooling ecosystem
+
+Two primary tools support this workflow:
+
+**MazeCompiler**:
+- Input: YAML/JSON source files
+- Output: Compiled `world.db` (static game data)
+- Validates schemas, checks referential integrity, optimizes storage
+- Invoked during build process (CI/CD pipeline)
+
+**MazeEditor** (planned):
+- Primary mode: Direct SQLite editing (fast, WYSIWYG)
+- Import/Export: Can load YAML/JSON sources and export changes back
+- Use case: Rapid iteration on existing content without recompiling
+- Integration: Can optionally sync changes back to YAML sources for version control
+
+The source-driven approach preserves the benefits of version control (diffs, merges,
+history, collaboration) while delivering the performance and reliability of SQLite at runtime.
+
 ### Solid wall convention
 
 > **Absent edge = solid self-loop using the region's `default_wall_type`, no behaviour.**
@@ -310,65 +355,58 @@ Any direction that deviates from the default **must** have an explicit edge.
 A solid wall face is modelled as an edge where **`to == from`**: the edge starts and
 ends at the same node. The `state` field controls the player experience:
 
-| `state` on self-loop | Player experience |
+| `state` | on self-loop | Player experience |
 |---|---|---|
-| `solid` | Permanent structural wall. Renderer draws texture. No interaction. |
-| `closed` | Wall that gives feedback. Shows `fail_message_key` ("You hit a solid wall."). |
-| `open` | Silent no-op. Player stays, no error message. Useful for invisible triggers. |
+| `solid` | Permanent structural wall. | Renderer draws texture. No interaction. |
+| `closed` | Wall that gives feedback. | Shows `fail_message_key` ("You hit a solid wall."). |
+| `open` | Silent no-op. | Player stays, no error message. Useful for invisible triggers. |
 
-### JSON source schema
+### Source Data Schema (YAML/JSON)
 
-One JSON file per region, stored under `assets/data/dungeons/<region_id>.json`.
+One YAML (preferred) or JSON file per region, stored under `assets/data/dungeons/<region_id>.yaml`.
 
-```json
-{
-  "id": "sorpigal_town",
-  "name_key": "region.sorpigal.name",
-  "type": "town",
-  "width": 16,
-  "height": 16,
-  "texture_set": "town_stone",
-  "ambient_light": true,
-  "default_encounter_table": null,
-  "music_track": "town_theme",
+```yaml
+id: sorpigal_town
+name_key: region.sorpigal.name
+type: town
+width: 16
+height: 16
+texture_set: town_stone
+ambient_light: true
+default_encounter_table: null
+music_track: town_theme
 
-  "nodes": [
-    {
-      "id": "sorpigal:8:3",
-      "x": 8,
-      "y": 3,
-      "type": "cell",
-      "flags": {},
-      "on_enter": null,
-      "items": [],
-      "encounters": null,
-      "edges": [
-        {
-          "id": "sorpigal:8:3:north",
-          "to": "sorpigal:8:2",
-          "direction": "north",
-          "state": "open",
-          "wall_visuals": { "default": "none" },
-          "condition": null,
-          "on_traverse": null,
-          "flags": {}
-        }
-      ]
-    }
-  ],
+nodes:
+  - id: sorpigal:8:3
+    x: 8
+    y: 3
+    type: cell
+    flags: {}
+    on_enter: null
+    items: []
+    encounters: null
+    edges:
+      - id: sorpigal:8:3:north
+        to: sorpigal:8:2
+        direction: north
+        state: open
+        wall_visuals:
+          default: none
+        condition: null
+        on_traverse: null
+        flags: {}
 
-  "npcs": [
-    {
-      "id": "innkeeper_sorpigal",
-      "name_key": "npc.innkeeper_sorpigal.name",
-      "home_node_id": "sorpigal:8:3",
-      "schedule": null,
-      "on_tick": null,
-      "on_interact": { "type": "script", "package": "npcs/innkeeper" },
-      "flags": { "essential": true }
-    }
-  ]
-}
+npcs:
+  - id: innkeeper_sorpigal
+    name_key: npc.innkeeper_sorpigal.name
+    home_node_id: sorpigal:8:3
+    schedule: null
+    on_tick: null
+    on_interact:
+      type: script
+      package: npcs/innkeeper
+    flags:
+      essential: true
 ```
 
 ### Compiled SQLite schema
@@ -444,7 +482,7 @@ CREATE TABLE npc_schedules (
 - Non-spatial game states (death, victory) integrate into the same model
 - **Flexibility**: Can represent any topology (linear, branching, loops, vertical)
 - **Scriptability**: Lua conditions/actions enable complex behaviors without code changes
-- **Authoring**: Graph structure is easily serializable (JSON) and editable
+- **Authoring**: Graph structure is easily serializable (YAML/JSON) and editable
 - **Abstraction**: Decouples logical structure from visual representation
 - **Testing**: Graph can be validated independently of rendering
 
@@ -507,34 +545,33 @@ The `flags` field on Node, Edge, and NPC entities uses a specialized data struct
 **Type**: `Dictionary<string, bool>` with special semantics:
 - **Getter**: Returns `false` for missing keys (default value)
 - **Setter**: Deletes keys when set to `false` (sparse storage)
-- **JSON serialization**: Includes only flags set to `true`
+- **Serialization (YAML/JSON)**: Includes only flags set to `true`
 
 **Rationale**:
 - Most flags are `false` most of the time — storing only `true` values saves space
-- The sparse representation makes JSON diffs cleaner (no noise from unchanged flags)
+- The sparse representation makes YAML/JSON diffs cleaner (no noise from unchanged flags)
 - Getters defaulting to `false` means code can check flags without null checks
 
 **Example**:
-```json
-// This JSON:
-{ "flags": { "nonMagic": true } }
+```yaml
+# This YAML:
+flags:
+  nonMagic: true
 
-// Represents:
-{
-  "nonMagic": true,
-  "dark": false,
-  "dangerous": false,
-  "noRecall": false,
-  "outdoor": false
-}
+# Represents:
+nonMagic: true
+dark: false
+dangerous: false
+noRecall: false
+outdoor: false
 
-// Empty flags object means all flags are false:
-{ "flags": {} }
+# Empty flags object means all flags are false:
+flags: {}
 ```
 
 **Implementation note**: The underlying storage is effectively a `HashSet<string>` of flag names,
 not a dictionary of bool values. The `Dictionary<string, bool>` type signature is a public API
-convenience that maps cleanly to JSON objects.
+convenience that maps cleanly to YAML/JSON objects.
 
 ## Alternatives Considered
 
