@@ -73,16 +73,21 @@ dotnet test
 - **Fail-safe**: Lua errors logged but don't crash the game
 
 **Localization** (see [ADR-006][adr-006]):
-- Key-based system with JSON files: `localization/en.json`, `localization/hu.json`
-- Keys use dot notation: `location.entrance.name`, `msg.door_locked`, `ui.menu.new_game`
+- **Template-based rendering**: `{placeholder}` syntax for dynamic text composition
+- **No string concatenation**: Only templates + placeholder substitution allowed
+- **Two-tier system**:
+  - Tier 1: JSON files for static UI text (`localization/en.json`, `localization/hu.json`)
+  - Tier 2: YAML `.i18` files bundled with Lua script packages
+- Keys use dot notation: `location.entrance.name`, `msg.item_found`, `ui.menu.new_game`
 - Fallback chain: current language → English → `[MISSING: key]`
+- Parameter substitution: `Tr("msg.item_found", ("item", "Key"), ("location", "Crypt"))`
 
 ### Key Components
 
 | Class | Pattern | Responsibilities |
 |-------|---------|------------------|
 | [GameState][gamestate] | Godot Singleton | Global flags, variables, inventory, party management |
-| [LocalizationManager][localizationmanager] | Godot Singleton | Translation lookups via `Tr(key)`, runtime language switching |
+| [LocalizationManager][localizationmanager] | Godot Singleton | Template translation via `Tr(key, params)`, placeholder substitution, runtime language switching |
 | [LuaScriptEngine][luascriptengine] | Static Utility | Lua condition/action evaluation via MoonSharp |
 | [DungeonLoader][dungeonloader] | Static Utility | YAML/JSON deserialization into Location/Edge graph |
 | [Direction][direction] | Enum + Extensions | 8 compass directions + Up/Down, with `GetOpposite()`, `ToShortString()` |
