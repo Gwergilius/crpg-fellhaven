@@ -1,0 +1,221 @@
+# Fellhaven - Cursor IDE Rules
+
+You are an expert AI coding assistant working on the Fellhaven CRPG project.
+
+## Project Context
+
+Read and follow ALL guidelines from these project files:
+
+1. **AGENTS.md** - Complete AI agent instructions including:
+   - Project architecture (graph-based dungeon model, Lua scripting, localization)
+   - Core components and their interactions
+   - Coding conventions and naming standards
+   - File organization patterns
+   - Common tasks and workflows
+
+2. **CODING_GUIDELINES.md** - Coding standards including:
+   - SOLID principles with examples
+   - FluentResults usage (Result pattern instead of exceptions)
+   - MediatR pattern for loose coupling (CQRS, commands, queries, notifications)
+   - C# 14 modern features
+   - Error handling strategies
+
+3. **CONTRIBUTING.md** - Contribution guidelines including:
+   - Commit message conventions (Conventional Commits)
+   - Code review process
+   - Testing requirements
+
+## Technology Stack
+
+- **Engine**: Godot 4.4 (.NET version)
+- **Language**: C# with .NET 10 (fallback: .NET 8), C# 14 (fallback: C# 12)
+- **IDE**: Visual Studio 2026 or VS Code
+- **Solution Format**: `.slnx` (Visual Studio 2026+ XML format)
+- **Key Libraries**:
+  - MoonSharp (Lua scripting)
+  - FluentResults (Result pattern)
+  - MediatR (Mediator pattern)
+  - System.Text.Json
+
+## Key Principles
+
+1. **Data-Driven Design**: Gameplay logic lives in JSON + Lua, not hardcoded C#
+2. **Graph-Based Navigation**: Dungeons are directed graphs, not grids
+3. **Fail-Safe Lua**: Lua errors return false (deny access), never crash
+4. **SOLID Architecture**: Follow dependency inversion, single responsibility
+5. **Result Pattern**: Use `Result<T>` for expected failures, exceptions for exceptional cases
+6. **Loose Coupling**: Use MediatR for component communication
+
+## Documentation Structure
+
+```
+docs/
+├─ adr/              # Architecture Decision Records (ADR-001, ADR-002, ADR-003)
+├─ api/              # API documentation (lua_api.md, graph_format.md)
+└─ gdd/              # Game Design Document
+```
+
+Consult these files for detailed specifications:
+- **docs/adr/001-graph-based-dungeon.md** - Graph model architecture
+- **docs/adr/002-lua-scripting.md** - Lua integration details
+- **docs/adr/003-localization.md** - Localization system
+- **docs/api/lua_api.md** - Complete Lua API reference
+- **docs/api/graph_format.md** - JSON dungeon format specification
+
+## Naming Conventions
+
+| Type | Convention | Examples |
+|------|-----------|----------|
+| C# classes/methods/properties | `PascalCase` | `GameState`, `TryMove()`, `CurrentLocation` |
+| C# local variables | `camelCase` | `edgesInDirection`, `isLocked` |
+| C# private fields | `_camelCase` | `_instance`, `_items`, `_currentLanguage` |
+| Game IDs (dungeons, locations, edges) | `snake_case` | `test_dungeon`, `entrance`, `corridor_to_locked_room` |
+| Localization keys | `dot.separated.snake_case` | `location.entrance.name`, `ui.menu.new_game` |
+| GameState flags/variables | `snake_case` | `treasure_room_unlocked`, `main_quest_stage` |
+
+## Markdown Documentation Rules
+
+**NEVER use inline links** `[text](url)` in markdown files. 
+**ALWAYS use reference-style links** `[text][ref-id]` with definitions at the top of the file.
+
+Example:
+```markdown
+# Document Title
+
+[link-id]: path/to/file.md "Optional Tooltip"
+[another-link]: https://example.com
+
+See [this document][link-id] for details.
+```
+
+## Error Handling Pattern
+
+```csharp
+using FluentResults;
+
+// ✅ Good: Use Result<T> for business logic failures
+public Result<Item> RemoveItem(string itemId, int count)
+{
+    if (!_items.ContainsKey(itemId))
+        return Result.Fail<Item>($"Item '{itemId}' not found");
+    
+    if (_items[itemId].Count < count)
+        return Result.Fail<Item>($"Insufficient quantity");
+    
+    _items[itemId].Count -= count;
+    return Result.Ok(_items[itemId]);
+}
+
+// Usage
+var result = inventoryService.RemoveItem("key", 1);
+if (result.IsSuccess)
+{
+    // Use result.Value
+}
+else
+{
+    GD.PrintErr($"Error: {result.Errors[0].Message}");
+}
+```
+
+## MediatR Pattern
+
+```csharp
+using MediatR;
+
+// Query (read data)
+public record GetLocationQuery(string LocationId) : IRequest<Result<Location>>;
+
+// Command (modify state)
+public record UnlockDoorCommand(string EdgeId) : IRequest<Result>;
+
+// Notification (event)
+public record LocationChangedNotification(string LocationId) : INotification;
+
+// Handler
+public class GetLocationHandler : IRequestHandler<GetLocationQuery, Result<Location>>
+{
+    public async Task<Result<Location>> Handle(GetLocationQuery request, CancellationToken ct)
+    {
+        // Implementation
+    }
+}
+```
+
+## Build & Test Commands
+
+```bash
+# Build solution
+dotnet build src/Fellhaven.slnx
+
+# Run tests
+cd tests
+dotnet test
+
+# Run specific test
+dotnet test --filter "FullyQualifiedName~DirectionTests"
+```
+
+## Commit Message Format
+
+Use Conventional Commits:
+```
+<type>(<scope>): <subject>
+
+<body>
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+Example:
+```
+feat(combat): add critical hit system
+
+- Implemented roll mechanics
+- Added critical multiplier to weapons
+- Updated combat tests
+```
+
+## When Adding New Features
+
+1. Check if it should be data-driven (JSON/Lua) vs hardcoded (C#)
+2. Follow SOLID principles - single responsibility
+3. Return `Result<T>` for operations that can fail
+4. Use MediatR for cross-component communication
+5. Add XML documentation to public APIs
+6. Write unit tests
+7. Update relevant documentation (ADRs, API docs)
+
+## Godot-Specific Patterns
+
+```csharp
+// Singleton pattern for Godot Nodes
+public partial class GameState : Node
+{
+    private static GameState? _instance;
+    public static GameState Instance => _instance!;
+    
+    public override void _Ready()
+    {
+        _instance = this;
+    }
+}
+
+// Use GD.Print for logging, not Console.WriteLine
+GD.Print("Information message");
+GD.PrintErr("Error message");
+```
+
+## File Organization
+
+```
+src/Fellhaven/scripts/
+├─ core/        # Game logic: Location, Edge, Direction, GameState, LuaScriptEngine
+└─ systems/     # Data loading & services: DungeonLoader, LocalizationManager
+```
+
+---
+
+**Remember**: The dungeon graph is data-driven. When adding features, prefer extending the Lua API over adding C# classes. Keep gameplay logic in JSON + Lua for easy iteration without recompilation.
+
+For complete details, consult AGENTS.md, CODING_GUIDELINES.md, and the docs/ folder.

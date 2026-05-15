@@ -1,0 +1,43 @@
+{
+  "ui.menu.new_game": "New Game",
+  "ui.menu.load_game": "Load Game",
+  "ui.menu.settings": "Settings",
+  "ui.menu.quit": "Quit",
+  
+  "ui.combat.attack": "Attack",
+  "ui.combat.defend": "Defend",
+  "ui.combat.skill": "Skill",
+  "ui.combat.item": "Item",
+  "ui.combat.flee": "Flee",
+  
+  "ui.direction.north": "North",
+  "ui.direction.northeast": "Northeast",
+  "ui.direction.east": "East",
+  "ui.direction.southeast": "Southeast",
+  "ui.direction.south": "South",
+  "ui.direction.southwest": "Southwest",
+  "ui.direction.west": "West",
+  "ui.direction.northwest": "Northwest",
+  "ui.direction.up": "Up",
+  "ui.direction.down": "Down",
+  
+  "location.test_dungeon.entrance.name": "Dungeon Entrance",
+  "location.test_dungeon.entrance.desc": "A dark stone archway leads into the depths below. The air is damp and cold.",
+  
+  "location.test_dungeon.corridor.name": "Stone Corridor",
+  "location.test_dungeon.corridor.desc": "A narrow corridor carved from ancient stone. Torches flicker on the walls.",
+  
+  "location.test_dungeon.locked_room.name": "Treasure Chamber",
+  "location.test_dungeon.locked_room.desc": "A grand chamber with a high ceiling. Gold and jewels glitter in the torchlight.",
+  
+  "item.golden_key.name": "Golden Key",
+  "item.golden_key.desc": "An ornate key made of solid gold. It must open something important.",
+  
+  "item.health_potion.name": "Health Potion",
+  "item.health_potion.desc": "A red liquid that restores vitality.",
+  
+  "msg.door_locked": "The door is locked. You need a key.",
+  "msg.door_unlocked": "The golden key fits perfectly. The door unlocks with a satisfying click.",
+  "msg.no_passage": "There is no passage in that direction.",
+  "msg.wall_blocks": "A solid wall blocks your path."
+}

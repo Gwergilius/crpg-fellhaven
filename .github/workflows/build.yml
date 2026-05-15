@@ -1,0 +1,55 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    name: Build Godot Project
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Setup Godot
+      uses: chickensoft-games/setup-godot@v1
+      with:
+        version: 4.4.0
+        use-dotnet: true
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Fellhaven.slnx
+    
+    - name: Build C# solution
+      run: dotnet build src/Fellhaven.slnx --configuration Release --no-restore
+    
+    - name: Run tests
+      run: dotnet test tests/ --no-restore --verbosity normal
+    
+    - name: Verify Godot project
+      run: |
+        cd src/Fellhaven
+        godot --headless --check-only --quit
+
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Run dotnet format
+      run: dotnet format src/Fellhaven.slnx --verify-no-changes --verbosity diagnostic

@@ -1,0 +1,61 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.cs     text diff=csharp
+*.gd     text diff=python
+*.lua    text
+*.json   text
+*.xml    text
+*.yaml   text
+*.yml    text
+*.md     text
+*.txt    text
+
+# Godot files
+*.tscn   text
+*.tres   text
+*.cfg    text
+*.godot  text
+
+# Graphics
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.bmp    binary
+*.svg    text
+
+# Audio
+*.mp3    binary
+*.ogg    binary
+*.wav    binary
+
+# 3D Models
+*.fbx    binary
+*.obj    text
+*.glb    binary
+*.gltf   text
+
+# Fonts
+*.ttf    binary
+*.otf    binary
+
+# Archives
+*.zip    binary
+*.7z     binary
+*.tar    binary
+*.gz     binary
+
+# Executables
+*.exe    binary
+*.dll    binary
+*.so     binary
+*.dylib  binary
+
+# Unity / .NET specific
+*.sln    text eol=crlf
+*.slnx   text
+*.csproj text
+*.props  text
+*.targets text

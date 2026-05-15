@@ -1,0 +1,15 @@
+<Project Sdk="Godot.NET.Sdk/4.4.0">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net8.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'ios' ">net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Nullable>enable</Nullable>
+    <LangVersion>12</LangVersion>
+    <RootNamespace>Fellhaven</RootNamespace>
+    <AssemblyName>Fellhaven</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MoonSharp" Version="2.0.0" />
+  </ItemGroup>
+</Project>

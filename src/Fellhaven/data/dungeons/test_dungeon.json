@@ -1,0 +1,100 @@
+{
+  "dungeon_id": "test_dungeon",
+  "name_key": "location.test_dungeon.name",
+  "description": "A simple test dungeon demonstrating the graph-based dungeon system.",
+  "locations": [
+    {
+      "id": "entrance",
+      "name_key": "location.test_dungeon.entrance.name",
+      "description_key": "location.test_dungeon.entrance.desc",
+      "background_texture": "res://assets/textures/backgrounds/dungeon_entrance.png"
+    },
+    {
+      "id": "corridor",
+      "name_key": "location.test_dungeon.corridor.name",
+      "description_key": "location.test_dungeon.corridor.desc",
+      "background_texture": "res://assets/textures/backgrounds/stone_corridor.png"
+    },
+    {
+      "id": "locked_room",
+      "name_key": "location.test_dungeon.locked_room.name",
+      "description_key": "location.test_dungeon.locked_room.desc",
+      "background_texture": "res://assets/textures/backgrounds/treasure_room.png",
+      "objects": [
+        {
+          "id": "treasure_chest",
+          "type": "container",
+          "name_key": "object.treasure_chest.name"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "entrance_to_corridor",
+      "source": "entrance",
+      "destination": "corridor",
+      "direction": "North",
+      "priority": 1,
+      "wall_texture": "res://assets/textures/walls/stone_wall.png",
+      "condition_script": "",
+      "actions": []
+    },
+    {
+      "id": "corridor_to_entrance",
+      "source": "corridor",
+      "destination": "entrance",
+      "direction": "South",
+      "priority": 1,
+      "wall_texture": "res://assets/textures/walls/stone_wall.png",
+      "condition_script": "",
+      "actions": []
+    },
+    {
+      "id": "corridor_to_locked_door_locked",
+      "source": "corridor",
+      "destination": "corridor",
+      "direction": "North",
+      "priority": 1,
+      "wall_texture": "res://assets/textures/walls/locked_door.png",
+      "door_texture": "res://assets/textures/doors/iron_door_locked.png",
+      "condition_script": "return not HasFlag(gameState, \"treasure_room_unlocked\")",
+      "actions": [
+        {
+          "id": "show_locked_message",
+          "condition_script": "",
+          "action_script": "ShowMessage(gameState, \"msg.door_locked\")",
+          "description": "Display message that door is locked"
+        }
+      ]
+    },
+    {
+      "id": "corridor_to_locked_door_unlocked",
+      "source": "corridor",
+      "destination": "locked_room",
+      "direction": "North",
+      "priority": 2,
+      "wall_texture": "res://assets/textures/walls/open_door.png",
+      "door_texture": "res://assets/textures/doors/iron_door_open.png",
+      "condition_script": "return HasFlag(gameState, \"treasure_room_unlocked\") or HasItem(gameState, \"golden_key\")",
+      "actions": [
+        {
+          "id": "unlock_with_key",
+          "condition_script": "return HasItem(gameState, \"golden_key\") and not HasFlag(gameState, \"treasure_room_unlocked\")",
+          "action_script": "RemoveItem(gameState, \"golden_key\", 1)\nSetFlag(gameState, \"treasure_room_unlocked\", true)\nShowMessage(gameState, \"msg.door_unlocked\")",
+          "description": "Consume golden key and unlock door permanently"
+        }
+      ]
+    },
+    {
+      "id": "locked_room_to_corridor",
+      "source": "locked_room",
+      "destination": "corridor",
+      "direction": "South",
+      "priority": 1,
+      "wall_texture": "res://assets/textures/walls/open_door.png",
+      "condition_script": "",
+      "actions": []
+    }
+  ]
+}

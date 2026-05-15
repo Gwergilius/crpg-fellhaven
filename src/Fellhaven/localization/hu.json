@@ -1,0 +1,43 @@
+{
+  "ui.menu.new_game": "Új Játék",
+  "ui.menu.load_game": "Játék Betöltése",
+  "ui.menu.settings": "Beállítások",
+  "ui.menu.quit": "Kilépés",
+  
+  "ui.combat.attack": "Támadás",
+  "ui.combat.defend": "Védelem",
+  "ui.combat.skill": "Képesség",
+  "ui.combat.item": "Tárgy",
+  "ui.combat.flee": "Menekülés",
+  
+  "ui.direction.north": "Észak",
+  "ui.direction.northeast": "Északkelet",
+  "ui.direction.east": "Kelet",
+  "ui.direction.southeast": "Délkelet",
+  "ui.direction.south": "Dél",
+  "ui.direction.southwest": "Délnyugat",
+  "ui.direction.west": "Nyugat",
+  "ui.direction.northwest": "Északnyugat",
+  "ui.direction.up": "Fel",
+  "ui.direction.down": "Le",
+  
+  "location.test_dungeon.entrance.name": "Kazamata Bejárata",
+  "location.test_dungeon.entrance.desc": "Egy sötét kőboltozat vezet le a mélységbe. A levegő nyirkos és hideg.",
+  
+  "location.test_dungeon.corridor.name": "Kőfolyosó",
+  "location.test_dungeon.corridor.desc": "Egy szűk, ősi kőből faragott folyosó. Fáklyák lobognak a falakon.",
+  
+  "location.test_dungeon.locked_room.name": "Kincseskamra",
+  "location.test_dungeon.locked_room.desc": "Egy pompás, magas mennyezetű terem. Arany és drágakövek csillognak a fáklyafényben.",
+  
+  "item.golden_key.name": "Arany Kulcs",
+  "item.golden_key.desc": "Tömör aranyból készült díszes kulcs. Biztosan valami fontos dolgot nyit.",
+  
+  "item.health_potion.name": "Gyógyital",
+  "item.health_potion.desc": "Egy vörös folyadék, amely helyreállítja az életenergiát.",
+  
+  "msg.door_locked": "Az ajtó zárva van. Kulcsra van szükséged.",
+  "msg.door_unlocked": "Az arany kulcs tökéletesen illeszkedik. Az ajtó kattanással kinyílik.",
+  "msg.no_passage": "Nincs átjáró abba az irányba.",
+  "msg.wall_blocks": "Tömör fal állja útjukat."
+}

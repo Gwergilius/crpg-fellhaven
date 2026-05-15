@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <Configuration>Debug</Configuration>
+    <Platform>Any CPU</Platform>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="Fellhaven\Fellhaven.csproj" />
+  </ItemGroup>
+</Project>
