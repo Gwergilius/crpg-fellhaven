@@ -622,6 +622,22 @@ If `visited` and `discovered` were node flags in `world.db`:
 This is the same reason `edge_overrides` exists: edge state (open/locked) can change per
 player, so it's stored in `save.db`, not as a mutable property in `world.db`.
 
+**Multi-user deployment**: This architecture naturally extends to **server-based/web deployment**
+scenarios ([ADR-002][adr-002]). A single `world.db` instance on the server can serve multiple
+concurrent players, each with their own `save.db`. The server maintains:
+- **One canonical world.db** (read-only, shared by all players)
+- **Per-player save.db files** (isolated, player-specific progress)
+
+This enables:
+- **Horizontal scaling**: world.db can be replicated across servers (read-only)
+- **Efficient updates**: patch world.db once, all players see updated content immediately
+- **Cloud saves**: save.db files stored per user account
+- **Minimal bandwidth**: only delta changes (save.db) transmitted, not entire world
+- **Reduced storage**: N players share 1 world.db + N small save.db files, not N full copies
+
+The strict separation between static world data and mutable player state is fundamental to
+scalable multi-user RPG architectures.
+
 ## Implementation Details
 
 ### Flags Representation
