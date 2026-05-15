@@ -6,6 +6,7 @@
 [adr-004]: docs/adr/004-condition-and-combat.md "Condition Vocabulary and Combat System"
 [adr-005]: docs/adr/005-lua-scripting.md "Event-Action System with Lua Scripting"
 [adr-006]: docs/adr/006-localization.md "Internationalization Strategy"
+[adr-007]: docs/adr/007-3d-rendering-strategy.md "3D Rendering Strategy"
 [location]: src/Fellhaven/scripts/core/Location.cs
 [edge]: src/Fellhaven/scripts/core/Edge.cs
 [gamestate]: src/Fellhaven/scripts/core/GameState.cs
@@ -23,7 +24,7 @@
 [coding-guidelines]: CODING_GUIDELINES.md "Coding Guidelines"
 [cursor-readme]: .cursor/README.md "Cursor IDE Configuration"
 
-Fellhaven is a turn-based fantasy CRPG built with **Godot 4.6.2** and **C# (.NET 10)**, using a graph-based dungeon model with Lua scripting.
+Fellhaven is a turn-based fantasy CRPG with **isometric/overhead 3D view** built with **Godot 4.6.2** and **C# (.NET 10)**, using a graph-based dungeon model with Lua scripting.
 
 > **Note**: This file contains instructions for GitHub Copilot and Claude. If you're using Cursor IDE, see [.cursor/README.md][cursor-readme] - Cursor has its own `.cursorrules` file that references this document.
 
@@ -81,6 +82,14 @@ dotnet test
 - Keys use dot notation: `location.entrance.name`, `msg.item_found`, `ui.menu.new_game`
 - Fallback chain: current language → English → `[MISSING: key]`
 - Parameter substitution: `Tr("msg.item_found", ("item", "Key"), ("location", "Crypt"))`
+
+**3D Rendering Strategy** (see [ADR-007][adr-007]):
+- **Isometric/overhead 3D view**: Camera positioned above and angled down (45-60°)
+- **Godot 3D engine**: Camera3D + MeshInstance3D for dungeon geometry
+- **Tactical visibility**: Entire room/region visible (not just one cell)
+- **Grid-based movement**: Discrete cell positions with smooth Tween interpolation
+- **Lighting and atmosphere**: DirectionalLight3D, OmniLight3D, WorldEnvironment
+- **Multi-level support**: Vertical dungeon levels via 3D Y-axis
 
 ### Key Components
 

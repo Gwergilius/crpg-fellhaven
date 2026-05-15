@@ -3,6 +3,7 @@
 [ADR-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
 [ADR-005]: 005-lua-scripting.md "Event-Action System with Lua Scripting"
 [ADR-006]: 006-localization.md "Internationalization Strategy"
+[ADR-007]: 007-3d-rendering-strategy.md "3D Rendering Strategy"
 
 # ADR-003: World Data Model — Directed Graph / Finite State Machine
 
@@ -48,7 +49,7 @@ For Fellhaven, we need a system that:
 - Supports turn-based movement in distinct locations
 - Allows complex conditional transitions between areas
 - Enables easy authoring and modification of dungeons
-- Works well with a first-person or isometric view
+- Works well with an isometric overhead view (see [ADR-007])
 - Supports scripted events triggered by movement
 - Models non-spatial game states (death, victory, character creation)
 - Enables static analysis (reachability, softlock detection)
@@ -234,7 +235,7 @@ This framing makes several previously implicit behaviours explicit and verifiabl
 The grid is a **rendering and locality constraint**, not a semantic one. Spatial nodes
 carry `(x, y)` coordinates within their region for rendering purposes:
 
-- **3D scene rendering**: First-person or isometric view of the current location
+- **3D scene rendering**: Isometric overhead view of the current location (see [ADR-007])
 - **Map rendering**: Local maps (automap) and world maps for navigation
 - **Fog-of-war**: Grid coordinates enable spatial visualization of discovered vs. undiscovered areas
 
@@ -789,6 +790,7 @@ Model every possible game state as a node, with no region/grid structure at all.
 - [ADR-004]: Condition Vocabulary and Combat System (condition/formula evaluation)
 - [ADR-005]: Event-Action System with Lua Scripting (two-tier action vocabulary)
 - [ADR-006]: Localization System (name_key fields)
+- [ADR-007]: 3D Rendering Strategy (isometric overhead view implementation)
 
 ---
 
