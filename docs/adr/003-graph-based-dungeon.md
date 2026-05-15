@@ -523,6 +523,7 @@ Every property in `world.db` is classified as either **static** (never changes) 
 |---|---|
 | Node topology, visual, flags | Static |
 | Node discovery state (fog-of-war) | **Mutable** |
+| Node visitation state (first visit tracking) | **Mutable** |
 | Edge topology, wall visuals | Static |
 | Edge state | **Mutable** |
 | Global and map-local flags | **Mutable** |
@@ -543,29 +544,46 @@ save.db
   edge_overrides    — (edge_id, current_state)  where state ≠ initial_state
   flag_overrides    — (flag_id, current_value)  where value ≠ initial_value
   consumed_spawns   — (node_id, item_id)         items already picked up
-  discovered_nodes  — (node_id, discovery_method) nodes known to the player (fog-of-war)
+  discovered_nodes  — (node_id, discovery_method) nodes known to player (appear on maps)
+  visited_nodes     — (node_id, first_visit_timestamp, visit_count) physically visited nodes
   npc_states        — (npc_id, current_node_id, alive, flags_json)
 ```
 
 Only NPCs whose state differs from their `world.db` defaults are written to `npc_states`.
 
-#### Node discovery and fog-of-war
+#### Node discovery vs. visitation
 
-The `discovered_nodes` table tracks which nodes the player **knows about**, not just which
-they have visited. A node can become known through multiple means:
+The system tracks two **independent** aspects of player knowledge:
 
-- **Physical visit**: Player enters the node (`discovery_method: 'visited'`)
+**Discovery (known locations)**: The `discovered_nodes` table tracks which nodes appear on
+the player's maps. A node can become known through multiple means:
+
 - **NPC dialogue**: An NPC describes a location (`discovery_method: 'npc_told'`)
 - **Map item**: Player acquires a map showing the area (`discovery_method: 'map_item'`)
 - **Spell or skill**: Revelation magic or scouting skills (`discovery_method: 'spell'`)
 - **Scripted event**: Quest or story progression reveals locations (`discovery_method: 'scripted'`)
+- **Physical visit**: Automatically discovered when visited (see below)
 
 Nodes not in `discovered_nodes` are **fogged** (unknown): they do not appear on the player's
-local or world maps. This enables classic fog-of-war gameplay where exploration progressively
-reveals the world.
+local or world maps.
+
+**Visitation (physically entered)**: The `visited_nodes` table tracks which nodes the player
+has **physically entered**. This determines which description to show:
+
+- **First visit** (node not in `visited_nodes`): Show long-form description with full details
+- **Return visit** (node in `visited_nodes`): Show brief description or skip entirely
+
+**Relationship**: When the player enters a node for the first time, **both** actions occur:
+1. Node is added to `visited_nodes` (marks physical presence)
+2. Node is added to `discovered_nodes` with `discovery_method: 'visited'` (if not already known)
+
+**Example scenarios**:
+- Player hears about a dungeon from an NPC → node is **discovered** but not **visited**
+- Player enters the dungeon → node becomes **visited** (first visit triggers detailed description)
+- Player returns to the dungeon → node is **visited** again (brief description or none)
 
 **Note**: The `discovery_method` field is informational only (for debugging/analytics). The
-presence or absence of a node in `discovered_nodes` is what matters for rendering.
+presence or absence of a node in the respective tables is what matters for gameplay.
 
 ## Implementation Details
 
