@@ -4,8 +4,9 @@
 [fluent-results]: https://github.com/altmann/FluentResults "FluentResults Library"
 [mediatr]: https://github.com/jbogard/MediatR "MediatR Library"
 [result-pattern]: https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/microservice-application-layer-implementation-web-api#use-domain-objects-for-the-web-api "Result Pattern"
-[csharp-conventions]: https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions "C# Coding Conventions"
-[agents]: AGENTS.md
+[C# Coding Conventions]: https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions "C# Coding Conventions"
+[AGENTS.md]: ./AGENTS.md
+[CONTRIBUTING.md]: ./CONTRIBUTING.md
 
 This document outlines coding standards and architectural principles for the Fellhaven project.
 
@@ -465,6 +466,6 @@ var message = result switch
 - **C# 14**: Leverage modern language features for cleaner code
 
 See also:
-- [AGENTS.md][agents] - General agent instructions and conventions
-- [C# Coding Conventions][csharp-conventions] - Microsoft's official style guide
-- [CONTRIBUTING.md][contributing] - How to contribute to the project
+- [AGENTS.md] - General agent instructions and conventions
+- [C# Coding Conventions] - Microsoft's official style guide
+- [CONTRIBUTING.md] - How to contribute to the project

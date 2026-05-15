@@ -153,33 +153,35 @@ public static bool EvaluateCondition(string script, GameState gameState)
 ```
 
 ### Markdown Documentation
-**NEVER use inline links** in Markdown documentation. Always use **reference-style links**:
+**NEVER use inline links** in Markdown documentation. Always use **reference-style links**.
 
-**❌ Incorrect** (inline links):
+**Preferred**: Use **shorthand reference** when the link text matches a suitable reference ID:
 ```markdown
-See the [ADR-001](docs/adr/001-graph-based-dungeon.md) for details.
-Check out [this guide](docs/api/lua_api.md).
+See [ADR-001] for details.
+Check [CODING_GUIDELINES] for code standards.
+
+[ADR-001]: docs/adr/001-graph-based-dungeon.md
+[CODING_GUIDELINES]: CODING_GUIDELINES.md
 ```
 
-**✅ Correct** (reference-style links):
+**Alternative**: Use separate reference IDs when link text differs from reference:
 ```markdown
-See the [ADR-001][adr-001] for details.
+See the [graph-based dungeon model][adr-001] for details.
 Check out [this guide][lua-api].
 
 [adr-001]: docs/adr/001-graph-based-dungeon.md "Graph-Based Dungeon Model"
 [lua-api]: docs/api/lua_api.md
 ```
 
-Or use shorthand when title matches the reference ID:
+**❌ Never use inline links**:
 ```markdown
-See [ADR-001] for details.
-
-[ADR-001]: docs/adr/001-graph-based-dungeon.md
+See the [ADR-001](docs/adr/001-graph-based-dungeon.md) for details.
+Check out [this guide](docs/api/lua_api.md).
 ```
 
 **Link definitions** must be placed at the **top of the file** (after title/intro). The tooltip part (`"tooltip text"`) is optional but recommended for clarity.
 
-This applies to **both links and images**:
+**Images** follow the same rules:
 ```markdown
 ![Architecture diagram][arch-diagram]
 
