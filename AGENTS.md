@@ -84,12 +84,16 @@ dotnet test
 - Parameter substitution: `Tr("msg.item_found", ("item", "Key"), ("location", "Crypt"))`
 
 **3D Rendering Strategy** (see [ADR-007][adr-007]):
-- **Isometric/overhead 3D view**: Camera positioned above and angled down (45-60°)
+- **Two-tier rendering system**:
+  - **Local maps** (region interiors): Isometric/overhead 3D view with Camera3D
+  - **World map** (region-to-region travel): 2D map with clickable destinations
+- **Isometric 3D** (local): Camera positioned above and angled down (45-60°)
 - **Godot 3D engine**: Camera3D + MeshInstance3D for dungeon geometry
 - **Tactical visibility**: Entire room/region visible (not just one cell)
 - **Grid-based movement**: Discrete cell positions with smooth Tween interpolation
 - **Lighting and atmosphere**: DirectionalLight3D, OmniLight3D, WorldEnvironment
 - **Multi-level support**: Vertical dungeon levels via 3D Y-axis
+- **Classic CRPG pattern**: Follows Fallout 1-2, Baldur's Gate 1-2 approach
 
 ### Key Components
 

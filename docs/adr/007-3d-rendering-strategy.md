@@ -3,6 +3,10 @@
 [ADR-003]: 003-graph-based-dungeon.md "World Data Model"
 [divinity-os]: https://store.steampowered.com/app/435150/Divinity_Original_Sin_2/ "Divinity: Original Sin 2"
 [bg3]: https://store.steampowered.com/app/1086940/Baldurs_Gate_3/ "Baldur's Gate 3"
+[bg1]: https://store.steampowered.com/app/228280/Baldurs_Gate_Enhanced_Edition/ "Baldur's Gate 1"
+[bg2]: https://store.steampowered.com/app/257350/Baldurs_Gate_II_Enhanced_Edition/ "Baldur's Gate 2"
+[fallout1]: https://store.steampowered.com/app/38400/Fallout_A_Post_Nuclear_Role_Playing_Game/ "Fallout 1"
+[fallout2]: https://store.steampowered.com/app/38410/Fallout_2_A_Post_Nuclear_Role_Playing_Game/ "Fallout 2"
 [pillars]: https://store.steampowered.com/app/291650/Pillars_of_Eternity/ "Pillars of Eternity"
 
 # ADR-007: 3D Rendering Strategy — Isometric/Overhead View
@@ -38,17 +42,38 @@ Three major rendering paradigms exist for grid-based dungeon games:
    - Simple rendering, good for strategy
    - Less immersive, flat appearance
 
-3. **Isometric/3/4 Overhead View** (Divinity: Original Sin, Baldur's Gate 3, Pillars of Eternity)
+3. **Isometric/3/4 Overhead View** (Fallout 1-2, Baldur's Gate 1-2, Divinity: Original Sin, Pillars of Eternity)
    - Angled overhead camera showing depth
    - Multiple grid cells visible (region/room scale)
    - Party, enemies, and environment visible together
    - Tactical overview while maintaining 3D depth
+   - **Used for local maps** (inside regions)
+
+**Note**: This ADR addresses **local map rendering** (within regions). Navigation **between
+regions** uses a separate 2D world map (see World Map section below).
 
 **Game Design Document states**: "Isometric 3/4 view (⭐ preferred)" — see `docs/gdd/GDD.md`
 
 ## Decision
 
-We will use **Godot's 3D engine with an isometric/overhead camera perspective** for dungeon rendering.
+We will use a **two-tier rendering system** for Fellhaven:
+
+### Local Map (Region Interior) — Isometric 3D
+
+We will use **Godot's 3D engine with an isometric/overhead camera perspective** for rendering
+the interior of regions (dungeons, towns, outdoor areas).
+
+### World Map (Region-to-Region Travel) — 2D
+
+Navigation **between regions** uses a **2D world map** with region nodes (cities, dungeons,
+wilderness areas). Players select a destination on the world map, and the party travels there
+(possibly with random encounters en route). Upon arrival, the game transitions to the 3D
+isometric view of that region.
+
+This follows the classic CRPG pattern:
+- [Fallout 1][fallout1] and [Fallout 2][fallout2]: 2D world map + isometric local maps
+- [Baldur's Gate 1][bg1] and [Baldur's Gate 2][bg2]: 2D world map + isometric area maps
+- Many classic CRPGs (Arcanum, Icewind Dale, etc.)
 
 ### Camera Configuration
 
@@ -82,12 +107,28 @@ The dungeon world is a **3D scene** composed of:
    - Node graph from [ADR-003] maps to 3D positions
    - Edges determine valid movement paths
 
-### Movement Model
+### Movement Model (Local Map)
 
-- **Turn-based movement**: Player selects destination cell
+- **Turn-based movement**: Player selects destination cell within the current region
 - **Smooth interpolation**: Party moves from cell to cell with Tween animation
 - **Camera follows**: Camera adjusts position to keep party in view
 - **Region visibility**: Entire room/region visible (not just one cell)
+
+### World Map Navigation
+
+The **world map** is a separate 2D view for traveling between regions:
+
+- **2D rendering**: Simple 2D scene with region nodes (cities, dungeons) and travel paths
+- **Click-to-travel**: Player clicks destination region on world map
+- **Travel time**: Configurable travel duration (instant, or time-based with random encounters)
+- **Region transitions**: Fade out from world map → fade in to 3D isometric view of destination
+- **Implementation**: Can be as simple as a static image with clickable hotspots, or a dynamic
+  graph visualization of the world structure from [ADR-003]
+
+**Examples from classic CRPGs**:
+- [Fallout 1][fallout1]/[2][fallout2]: 2D world map with travel system and random encounters
+- [Baldur's Gate 1][bg1]/[2][bg2]: 2D area map with clickable regions
+- Arcanum, Icewind Dale, Planescape: Torment: Similar 2D world/area maps
 
 ## Rationale
 
@@ -293,6 +334,40 @@ private Vector3 GridToWorld(int x, int y)
 }
 ```
 
+### World Map Implementation
+
+```csharp
+// Simple world map with clickable regions
+public partial class WorldMap : Node2D
+{
+    [Export] public Texture2D WorldMapImage { get; set; }
+    [Export] public RegionNode[] Regions { get; set; }  // Array of clickable region hotspots
+    
+    public void OnRegionClicked(string regionId)
+    {
+        // Travel to region (possibly with random encounters)
+        GameManager.Instance.TravelToRegion(regionId);
+    }
+}
+
+// Region hotspot definition
+public class RegionNode
+{
+    public string Id { get; set; }              // "fellhaven_town", "crypt_entrance"
+    public Vector2 WorldMapPosition { get; set; }  // Position on world map image
+    public Rect2 ClickableArea { get; set; }    // Hotspot bounds
+    public bool Discovered { get; set; }        // Fog of war
+}
+
+// Transition between world map and local map
+public void TravelToRegion(string regionId)
+{
+    FadeOut();
+    LoadRegion(regionId);  // Load 3D isometric scene
+    FadeIn();
+}
+```
+
 ## Validation
 
 Prototype phase will test:
@@ -301,12 +376,24 @@ Prototype phase will test:
 - Grid cell size and visibility range
 - Character sprite/model art direction
 - Performance on target platforms
+- World map UI/UX (click-to-travel, region discovery, travel encounters)
 
 ## References
 
+**Local Map (Isometric 3D) Examples:**
 - [Divinity: Original Sin 2][divinity-os] — Isometric party-based CRPG (2017)
 - [Baldur's Gate 3][bg3] — Isometric D&D CRPG (2023)
 - [Pillars of Eternity][pillars] — Isometric party-based CRPG (2015)
+
+**World Map + Local Map Pattern:**
+- [Fallout 1][fallout1] (1997) — 2D world map + isometric local maps
+- [Fallout 2][fallout2] (1998) — 2D world map + isometric local maps
+- [Baldur's Gate 1][bg1] (1998) — 2D area map + isometric regions
+- [Baldur's Gate 2][bg2] (2000) — 2D area map + isometric regions
+- Arcanum: Of Steamworks and Magick Obscura (2001)
+- Icewind Dale (2000), Planescape: Torment (1999)
+
+**Technical References:**
 - Godot 3D Camera documentation: https://docs.godotengine.org/en/stable/classes/class_camera3d.html
 - Godot 3D Scene documentation: https://docs.godotengine.org/en/stable/tutorials/3d/index.html
 
