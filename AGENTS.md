@@ -3,8 +3,9 @@
 [adr-001]: docs/adr/001-engine-choice.md "Engine Choice"
 [adr-002]: docs/adr/002-platform-strategy.md "Multi-Platform Development Strategy"
 [adr-003]: docs/adr/003-graph-based-dungeon.md "Graph-Based Dungeon Model"
-[adr-004]: docs/adr/004-lua-scripting.md "Lua Scripting for Conditions and Actions"
-[adr-005]: docs/adr/005-localization.md "Internationalization Strategy"
+[adr-004]: docs/adr/004-condition-and-combat.md "Condition Vocabulary and Combat System"
+[adr-005]: docs/adr/005-lua-scripting.md "Lua Scripting for Conditions and Actions"
+[adr-006]: docs/adr/006-localization.md "Internationalization Strategy"
 [location]: src/Fellhaven/scripts/core/Location.cs
 [edge]: src/Fellhaven/scripts/core/Edge.cs
 [gamestate]: src/Fellhaven/scripts/core/GameState.cs
@@ -57,13 +58,19 @@ dotnet test
 - **Edges** = [Edge][edge] objects (transitions with conditions)
 - Navigation: Player chooses direction → system finds edges in that direction ordered by `Priority` (lower = higher precedence) → first edge whose Lua condition evaluates `true` is taken
 
-**Lua Scripting** (see [ADR-004][adr-004]):
+**Condition and Combat System** (see [ADR-004][adr-004]):
+- Unified condition vocabulary for world and combat contexts
+- Dice formula syntax with stat references: `2d10+{DEX}+1`
+- Subject/quantifier system: `party`, `party.any`, `party.all`, `ally`, `enemy`, etc.
+- Logical connectives: `and`, `or`, `not` for composing conditions
+
+**Lua Scripting** (see [ADR-005][adr-005]):
 - All game logic (conditions, actions) runs in **MoonSharp** (Lua 5.2)
 - **No recompilation needed** for gameplay changes—edit YAML/JSON source files only
 - Conditions return `bool`, actions modify GameState
 - **Fail-safe**: Lua errors return `false` (deny access), logged but don't crash
 
-**Localization** (see [ADR-005][adr-005]):
+**Localization** (see [ADR-006][adr-006]):
 - Key-based system with JSON files: `localization/en.json`, `localization/hu.json`
 - Keys use dot notation: `location.entrance.name`, `msg.door_locked`, `ui.menu.new_game`
 - Fallback chain: current language → English → `[MISSING: key]`

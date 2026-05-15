@@ -1,8 +1,9 @@
 [lua-api]: ../api/lua_api.md "Lua API Reference"
 [adr-003]: 003-graph-based-dungeon.md "Graph-Based Dungeon Model"
-[adr-005]: 005-localization.md "Internationalization Strategy"
+[adr-004]: 004-condition-and-combat.md "Condition Vocabulary and Combat System"
+[adr-006]: 006-localization.md "Internationalization Strategy"
 
-# ADR-004: Lua Scripting for Conditions and Actions
+# ADR-005: Lua Scripting for Conditions and Actions
 
 **Status**: Accepted
 
