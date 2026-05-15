@@ -1,6 +1,3 @@
-using Godot;
-using System.Collections.Generic;
-
 namespace Fellhaven.Core;
 
 /// <summary>
@@ -10,47 +7,47 @@ namespace Fellhaven.Core;
 public partial class GameState : Node
 {
     private static GameState? _instance;
-    
+
     /// <summary>
     /// Singleton instance of GameState.
     /// </summary>
     public static GameState Instance => _instance!;
-    
+
     /// <summary>
     /// Global boolean flags (e.g., "door_opened", "quest_completed").
     /// </summary>
-    public Dictionary<string, bool> GlobalFlags { get; set; } = new();
-    
+    public Dictionary<string, bool> GlobalFlags { get; set; } = [];
+
     /// <summary>
     /// Global integer variables (e.g., quest stages, counters).
     /// </summary>
-    public Dictionary<string, int> Variables { get; set; } = new();
-    
+    public Dictionary<string, int> Variables { get; set; } = [];
+
     /// <summary>
     /// String variables (for more complex data).
     /// </summary>
-    public Dictionary<string, string> StringVariables { get; set; } = new();
-    
+    public Dictionary<string, string> StringVariables { get; set; } = [];
+
     /// <summary>
     /// Player's current location in the dungeon.
     /// </summary>
     public Location? CurrentLocation { get; set; }
-    
+
     /// <summary>
     /// Player's inventory.
     /// </summary>
     public Inventory Inventory { get; set; } = new();
-    
+
     /// <summary>
     /// Player's party (characters).
     /// </summary>
     public Party PlayerParty { get; set; } = new();
-    
+
     public override void _Ready()
     {
         _instance = this;
     }
-    
+
     /// <summary>
     /// Checks if a flag is set to true.
     /// </summary>
@@ -58,7 +55,7 @@ public partial class GameState : Node
     {
         return GlobalFlags.TryGetValue(flagName, out var value) && value;
     }
-    
+
     /// <summary>
     /// Sets a flag to the specified value.
     /// </summary>
@@ -67,7 +64,7 @@ public partial class GameState : Node
         GlobalFlags[flagName] = value;
         GD.Print($"[GameState] Flag '{flagName}' set to {value}");
     }
-    
+
     /// <summary>
     /// Gets an integer variable's value (returns 0 if not set).
     /// </summary>
@@ -75,7 +72,7 @@ public partial class GameState : Node
     {
         return Variables.GetValueOrDefault(varName, 0);
     }
-    
+
     /// <summary>
     /// Sets an integer variable to the specified value.
     /// </summary>
@@ -84,7 +81,7 @@ public partial class GameState : Node
         Variables[varName] = value;
         GD.Print($"[GameState] Variable '{varName}' set to {value}");
     }
-    
+
     /// <summary>
     /// Adds to an integer variable (creates it if it doesn't exist).
     /// </summary>
@@ -93,7 +90,7 @@ public partial class GameState : Node
         Variables[varName] = GetVariable(varName) + amount;
         GD.Print($"[GameState] Variable '{varName}' incremented by {amount} to {Variables[varName]}");
     }
-    
+
     /// <summary>
     /// Gets a string variable's value (returns empty string if not set).
     /// </summary>
@@ -101,7 +98,7 @@ public partial class GameState : Node
     {
         return StringVariables.GetValueOrDefault(varName, string.Empty);
     }
-    
+
     /// <summary>
     /// Sets a string variable to the specified value.
     /// </summary>
@@ -110,7 +107,7 @@ public partial class GameState : Node
         StringVariables[varName] = value;
         GD.Print($"[GameState] String variable '{varName}' set to '{value}'");
     }
-    
+
     /// <summary>
     /// Moves the player to a new location via an edge.
     /// </summary>
@@ -121,19 +118,19 @@ public partial class GameState : Node
             GD.PrintErr("[GameState] Cannot transition: edge has no destination");
             return;
         }
-        
+
         GD.Print($"[GameState] Transitioning from '{CurrentLocation?.Id}' to '{edge.Destination.Id}' via {edge.Direction}");
-        
+
         // Execute edge actions
         edge.ExecuteActions(this);
-        
+
         // Move to new location
         CurrentLocation = edge.Destination;
-        
+
         // Emit signal for UI update
         EmitSignal(SignalName.LocationChanged, edge.Destination.Id);
     }
-    
+
     /// <summary>
     /// Attempts to move in the specified direction.
     /// </summary>
@@ -145,19 +142,19 @@ public partial class GameState : Node
             GD.PrintErr("[GameState] Cannot move: no current location");
             return false;
         }
-        
+
         var edge = CurrentLocation.GetAvailableEdge(direction, this);
-        
+
         if (edge == null)
         {
             GD.Print($"[GameState] No available edge in direction {direction}");
             return false;
         }
-        
+
         TransitionTo(edge);
         return true;
     }
-    
+
     /// <summary>
     /// Resets the game state to initial values.
     /// </summary>
@@ -169,16 +166,16 @@ public partial class GameState : Node
         CurrentLocation = null;
         Inventory.Clear();
         PlayerParty = new Party();
-        
+
         GD.Print("[GameState] Game state reset");
     }
-    
+
     [Signal]
     public delegate void LocationChangedEventHandler(string locationId);
-    
+
     [Signal]
     public delegate void FlagChangedEventHandler(string flagName, bool value);
-    
+
     [Signal]
     public delegate void VariableChangedEventHandler(string varName, int value);
 }
@@ -188,8 +185,8 @@ public partial class GameState : Node
 /// </summary>
 public class Inventory
 {
-    private readonly Dictionary<string, int> _items = new();
-    
+    private readonly Dictionary<string, int> _items = [];
+
     /// <summary>
     /// Checks if the inventory contains at least one of an item.
     /// </summary>
@@ -197,7 +194,7 @@ public class Inventory
     {
         return _items.GetValueOrDefault(itemId, 0) > 0;
     }
-    
+
     /// <summary>
     /// Checks if the inventory contains at least the specified count of an item.
     /// </summary>
@@ -205,7 +202,7 @@ public class Inventory
     {
         return _items.GetValueOrDefault(itemId, 0) >= count;
     }
-    
+
     /// <summary>
     /// Gets the count of a specific item.
     /// </summary>
@@ -213,7 +210,7 @@ public class Inventory
     {
         return _items.GetValueOrDefault(itemId, 0);
     }
-    
+
     /// <summary>
     /// Adds items to the inventory.
     /// </summary>
@@ -222,29 +219,29 @@ public class Inventory
         _items[itemId] = GetItemCount(itemId) + count;
         GD.Print($"[Inventory] Added {count}x '{itemId}' (total: {_items[itemId]})");
     }
-    
+
     /// <summary>
     /// Removes items from the inventory.
     /// </summary>
     public bool RemoveItem(string itemId, int count = 1)
     {
         var currentCount = GetItemCount(itemId);
-        
+
         if (currentCount < count)
         {
             GD.PrintErr($"[Inventory] Cannot remove {count}x '{itemId}' (only have {currentCount})");
             return false;
         }
-        
+
         _items[itemId] = currentCount - count;
-        
+
         if (_items[itemId] <= 0)
             _items.Remove(itemId);
-        
+
         GD.Print($"[Inventory] Removed {count}x '{itemId}' (remaining: {_items.GetValueOrDefault(itemId, 0)})");
         return true;
     }
-    
+
     /// <summary>
     /// Gets all items in the inventory.
     /// </summary>
@@ -252,7 +249,7 @@ public class Inventory
     {
         return _items;
     }
-    
+
     /// <summary>
     /// Clears all items from the inventory.
     /// </summary>
@@ -268,8 +265,8 @@ public class Inventory
 /// </summary>
 public class Party
 {
-    public List<Character> Members { get; set; } = new();
-    
+    public List<Character> Members { get; set; } = [];
+
     /// <summary>
     /// Checks if any party member has the specified class.
     /// </summary>
@@ -277,7 +274,7 @@ public class Party
     {
         return Members.Any(m => m.ClassName.Equals(className, System.StringComparison.OrdinalIgnoreCase));
     }
-    
+
     /// <summary>
     /// Checks if any party member has the specified skill at minimum level.
     /// </summary>
@@ -285,7 +282,7 @@ public class Party
     {
         return Members.Any(m => m.GetSkillLevel(skillName) >= minLevel);
     }
-    
+
     /// <summary>
     /// Gets the average level of the party.
     /// </summary>
@@ -293,7 +290,7 @@ public class Party
     {
         if (Members.Count == 0)
             return 0;
-        
+
         return (int)Members.Average(m => m.Level);
     }
 }
@@ -310,10 +307,10 @@ public class Character
     public int MaxHP { get; set; } = 100;
     public int CurrentMP { get; set; } = 50;
     public int MaxMP { get; set; } = 50;
-    
-    public Dictionary<string, int> Skills { get; set; } = new();
-    public Dictionary<string, int> Attributes { get; set; } = new();
-    
+
+    public Dictionary<string, int> Skills { get; set; } = [];
+    public Dictionary<string, int> Attributes { get; set; } = [];
+
     public int GetSkillLevel(string skillName)
     {
         return Skills.GetValueOrDefault(skillName, 0);

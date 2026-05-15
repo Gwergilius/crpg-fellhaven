@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using Fellhaven.Core;
+using NUnit.Framework;
 
 namespace Fellhaven.Tests.Core;
 
@@ -14,7 +14,7 @@ public class DirectionTests
         Assert.That(Direction.NorthEast.GetOpposite(), Is.EqualTo(Direction.SouthWest));
         Assert.That(Direction.Up.GetOpposite(), Is.EqualTo(Direction.Down));
     }
-    
+
     [Test]
     public void ToShortString_ReturnsCorrectAbbreviation()
     {

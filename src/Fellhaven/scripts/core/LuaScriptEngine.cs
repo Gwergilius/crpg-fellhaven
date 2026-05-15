@@ -1,6 +1,5 @@
-using Godot;
 using MoonSharp.Interpreter;
-using System;
+using LuaScript = MoonSharp.Interpreter.Script;
 
 namespace Fellhaven.Core;
 
@@ -10,9 +9,9 @@ namespace Fellhaven.Core;
 /// </summary>
 public static class LuaScriptEngine
 {
-    private static Script? _luaEngine;
+    private static LuaScript? _luaEngine;
     private static bool _initialized = false;
-    
+
     /// <summary>
     /// Initializes the Lua engine and registers built-in functions.
     /// </summary>
@@ -20,14 +19,14 @@ public static class LuaScriptEngine
     {
         if (_initialized)
             return;
-        
-        _luaEngine = new Script();
+
+        _luaEngine = new LuaScript();
         RegisterBuiltInFunctions();
         _initialized = true;
-        
+
         GD.Print("[LuaScriptEngine] Initialized with MoonSharp");
     }
-    
+
     /// <summary>
     /// Registers all built-in Lua functions that can be called from scripts.
     /// </summary>
@@ -35,62 +34,62 @@ public static class LuaScriptEngine
     {
         if (_luaEngine == null)
             return;
-        
+
         // Register GameState type
         UserData.RegisterType<GameState>();
-        
+
         // === Flag Management ===
         _luaEngine.Globals["HasFlag"] = (Func<GameState, string, bool>)
             ((state, flag) => state.HasFlag(flag));
-        
+
         _luaEngine.Globals["SetFlag"] = (Action<GameState, string, bool>)
             ((state, flag, value) => state.SetFlag(flag, value));
-        
+
         // === Variable Management ===
         _luaEngine.Globals["GetVar"] = (Func<GameState, string, int>)
             ((state, varName) => state.GetVariable(varName));
-        
+
         _luaEngine.Globals["SetVar"] = (Action<GameState, string, int>)
             ((state, varName, value) => state.SetVariable(varName, value));
-        
+
         _luaEngine.Globals["AddVar"] = (Action<GameState, string, int>)
             ((state, varName, amount) => state.AddVariable(varName, amount));
-        
+
         // === Inventory Management ===
         _luaEngine.Globals["HasItem"] = (Func<GameState, string, bool>)
             ((state, itemId) => state.Inventory.HasItem(itemId));
-        
+
         _luaEngine.Globals["HasItems"] = (Func<GameState, string, int, bool>)
             ((state, itemId, count) => state.Inventory.HasItems(itemId, count));
-        
+
         _luaEngine.Globals["GetItemCount"] = (Func<GameState, string, int>)
             ((state, itemId) => state.Inventory.GetItemCount(itemId));
-        
+
         _luaEngine.Globals["GiveItem"] = (Action<GameState, string, int>)
             ((state, itemId, count) => state.Inventory.AddItem(itemId, count));
-        
+
         _luaEngine.Globals["RemoveItem"] = (Action<GameState, string, int>)
             ((state, itemId, count) => state.Inventory.RemoveItem(itemId, count));
-        
+
         // === Party & Character ===
         _luaEngine.Globals["HasClass"] = (Func<GameState, string, bool>)
             ((state, className) => state.PlayerParty.HasClass(className));
-        
+
         _luaEngine.Globals["HasSkill"] = (Func<GameState, string, int, bool>)
             ((state, skillName, minLevel) => state.PlayerParty.HasSkill(skillName, minLevel));
-        
+
         _luaEngine.Globals["GetPartyLevel"] = (Func<GameState, int>)
             ((state) => state.PlayerParty.GetAverageLevel());
-        
+
         // === UI & Messaging ===
         _luaEngine.Globals["ShowMessage"] = (Action<GameState, string>)
             ((state, messageKey) => ShowMessage(messageKey));
-        
+
         // === Utility ===
         _luaEngine.Globals["Log"] = (Action<string>)
             ((message) => GD.Print($"[Lua] {message}"));
     }
-    
+
     /// <summary>
     /// Evaluates a Lua condition script.
     /// </summary>
@@ -101,28 +100,28 @@ public static class LuaScriptEngine
     {
         if (!_initialized)
             Initialize();
-        
+
         if (_luaEngine == null)
         {
             GD.PrintErr("[LuaScriptEngine] Engine not initialized");
             return false;
         }
-        
+
         if (string.IsNullOrWhiteSpace(luaScript))
             return true; // Empty script = always true
-        
+
         try
         {
             _luaEngine.Globals["gameState"] = gameState;
             DynValue result = _luaEngine.DoString(luaScript);
-            
+
             // Handle different return types
             if (result.Type == DataType.Boolean)
                 return result.Boolean;
-            
+
             if (result.Type == DataType.Nil)
                 return false;
-            
+
             // Truthy evaluation for other types
             return result.CastToBool();
         }
@@ -137,7 +136,7 @@ public static class LuaScriptEngine
             return false;
         }
     }
-    
+
     /// <summary>
     /// Executes a Lua action script.
     /// </summary>
@@ -147,16 +146,16 @@ public static class LuaScriptEngine
     {
         if (!_initialized)
             Initialize();
-        
+
         if (_luaEngine == null)
         {
             GD.PrintErr("[LuaScriptEngine] Engine not initialized");
             return;
         }
-        
+
         if (string.IsNullOrWhiteSpace(luaScript))
             return; // Empty script = no action
-        
+
         try
         {
             _luaEngine.Globals["gameState"] = gameState;
@@ -171,7 +170,7 @@ public static class LuaScriptEngine
             GD.PrintErr($"[LuaScriptEngine] Unexpected error in action script: {ex.Message}");
         }
     }
-    
+
     /// <summary>
     /// Shows a localized message to the player.
     /// </summary>
@@ -180,7 +179,7 @@ public static class LuaScriptEngine
         // TODO: Implement message display system
         GD.Print($"[Message] {messageKey}");
     }
-    
+
     /// <summary>
     /// Validates a Lua script for syntax errors without executing it.
     /// </summary>
@@ -188,13 +187,13 @@ public static class LuaScriptEngine
     {
         if (!_initialized)
             Initialize();
-        
+
         if (_luaEngine == null)
         {
             errorMessage = "Engine not initialized";
             return false;
         }
-        
+
         try
         {
             _luaEngine.LoadString(luaScript);

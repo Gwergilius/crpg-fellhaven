@@ -1,9 +1,13 @@
-<Project>
-  <PropertyGroup>
-    <Configuration>Debug</Configuration>
-    <Platform>Any CPU</Platform>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="Fellhaven\Fellhaven.csproj" />
-  </ItemGroup>
-</Project>
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="ExportDebug" />
+    <BuildType Name="ExportRelease" />
+  </Configurations>
+  <Project Path="../tests/Fellhaven.Tests/Fellhaven.Tests.csproj">
+    <BuildType Solution="ExportDebug|*" Project="Release" />
+    <BuildType Solution="ExportRelease|*" Project="Release" />
+  </Project>
+  <Project Path="Fellhaven/Fellhaven.csproj" />
+</Solution>

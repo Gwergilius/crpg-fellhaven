@@ -1,7 +1,4 @@
-using Godot;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Runtime.CompilerServices;
 using Fellhaven.Core;
 
 namespace Fellhaven.Systems;
@@ -11,6 +8,11 @@ namespace Fellhaven.Systems;
 /// </summary>
 public static class DungeonLoader
 {
+    private static readonly JsonSerializerOptions _caseInsensitiveOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     /// <summary>
     /// Loads a dungeon from a JSON file.
     /// </summary>
@@ -23,7 +25,7 @@ public static class DungeonLoader
             GD.PrintErr($"[DungeonLoader] File not found: {filePath}");
             return null;
         }
-        
+
         try
         {
             using var file = FileAccess.Open(filePath, FileAccess.ModeFlags.Read);
@@ -32,19 +34,17 @@ public static class DungeonLoader
                 GD.PrintErr($"[DungeonLoader] Failed to open: {filePath}");
                 return null;
             }
-            
+
             string jsonText = file.GetAsText();
-            var dungeonData = JsonSerializer.Deserialize<DungeonData>(jsonText, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            
+
+            var dungeonData = JsonSerializer.Deserialize<DungeonData>(jsonText, _caseInsensitiveOptions);
+
             if (dungeonData == null)
             {
                 GD.PrintErr($"[DungeonLoader] Failed to parse JSON: {filePath}");
                 return null;
             }
-            
+
             return BuildDungeonGraph(dungeonData);
         }
         catch (System.Exception ex)
@@ -53,14 +53,14 @@ public static class DungeonLoader
             return null;
         }
     }
-    
+
     /// <summary>
     /// Builds the dungeon graph from deserialized data.
     /// </summary>
     private static Dictionary<string, Location> BuildDungeonGraph(DungeonData data)
     {
         var locations = new Dictionary<string, Location>();
-        
+
         // Create all locations
         foreach (var locData in data.Locations)
         {
@@ -70,7 +70,7 @@ public static class DungeonLoader
                 DescriptionKey = locData.DescriptionKey,
                 BackgroundTexture = locData.BackgroundTexture
             };
-            
+
             // Add objects if any
             if (locData.Objects != null)
             {
@@ -84,10 +84,10 @@ public static class DungeonLoader
                     });
                 }
             }
-            
+
             locations[location.Id] = location;
         }
-        
+
         // Create all edges and link them
         foreach (var edgeData in data.Edges)
         {
@@ -96,13 +96,13 @@ public static class DungeonLoader
                 GD.PrintErr($"[DungeonLoader] Edge '{edgeData.Id}': source location '{edgeData.Source}' not found");
                 continue;
             }
-            
+
             if (!locations.TryGetValue(edgeData.Destination, out var destination))
             {
                 GD.PrintErr($"[DungeonLoader] Edge '{edgeData.Id}': destination location '{edgeData.Destination}' not found");
                 continue;
             }
-            
+
             var edge = new Edge
             {
                 Id = edgeData.Id,
@@ -114,7 +114,7 @@ public static class DungeonLoader
                 DoorTexture = edgeData.DoorTexture,
                 ConditionScript = edgeData.ConditionScript ?? string.Empty
             };
-            
+
             // Add actions
             if (edgeData.Actions != null)
             {
@@ -129,15 +129,15 @@ public static class DungeonLoader
                     });
                 }
             }
-            
+
             source.OutgoingEdges.Add(edge);
         }
-        
+
         GD.Print($"[DungeonLoader] Loaded dungeon '{data.DungeonId}' with {locations.Count} locations and {data.Edges.Count} edges");
-        
+
         return locations;
     }
-    
+
     /// <summary>
     /// Parses a direction string to Direction enum.
     /// </summary>
@@ -166,34 +166,34 @@ internal class DungeonData
 {
     [JsonPropertyName("dungeon_id")]
     public string DungeonId { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("name_key")]
     public string NameKey { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("locations")]
-    public List<LocationData> Locations { get; set; } = new();
-    
+    public List<LocationData> Locations { get; set; } = [];
+
     [JsonPropertyName("edges")]
-    public List<EdgeData> Edges { get; set; } = new();
+    public List<EdgeData> Edges { get; set; } = [];
 }
 
 internal class LocationData
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("name_key")]
     public string NameKey { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("description_key")]
     public string DescriptionKey { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("background_texture")]
     public string BackgroundTexture { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("objects")]
     public List<LocationObjectData>? Objects { get; set; }
 }
@@ -202,10 +202,10 @@ internal class LocationObjectData
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("name_key")]
     public string NameKey { get; set; } = string.Empty;
 }
@@ -214,28 +214,28 @@ internal class EdgeData
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("source")]
     public string Source { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("destination")]
     public string Destination { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("direction")]
     public string Direction { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("priority")]
     public int Priority { get; set; } = 100;
-    
+
     [JsonPropertyName("wall_texture")]
     public string WallTexture { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("door_texture")]
     public string DoorTexture { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("condition_script")]
     public string? ConditionScript { get; set; }
-    
+
     [JsonPropertyName("actions")]
     public List<ActionData>? Actions { get; set; }
 }
@@ -244,13 +244,13 @@ internal class ActionData
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("condition_script")]
     public string? ConditionScript { get; set; }
-    
+
     [JsonPropertyName("action_script")]
     public string? ActionScript { get; set; }
-    
+
     [JsonPropertyName("description")]
     public string? Description { get; set; }
 }

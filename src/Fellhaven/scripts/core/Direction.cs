@@ -7,31 +7,31 @@ public enum Direction
 {
     /// <summary>North direction.</summary>
     North,
-    
+
     /// <summary>Northeast direction.</summary>
     NorthEast,
-    
+
     /// <summary>East direction.</summary>
     East,
-    
+
     /// <summary>Southeast direction.</summary>
     SouthEast,
-    
+
     /// <summary>South direction.</summary>
     South,
-    
+
     /// <summary>Southwest direction.</summary>
     SouthWest,
-    
+
     /// <summary>West direction.</summary>
     West,
-    
+
     /// <summary>Northwest direction.</summary>
     NorthWest,
-    
+
     /// <summary>Upward direction (stairs, ladder up).</summary>
     Up,
-    
+
     /// <summary>Downward direction (stairs, ladder down).</summary>
     Down
 }
@@ -61,7 +61,7 @@ public static class DirectionExtensions
             _ => direction
         };
     }
-    
+
     /// <summary>
     /// Converts direction to a short string representation (N, E, S, W, etc.)
     /// </summary>
