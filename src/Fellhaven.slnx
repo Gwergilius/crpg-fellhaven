@@ -1,9 +1,3 @@
-<Project>
-  <PropertyGroup>
-    <Configuration>Debug</Configuration>
-    <Platform>Any CPU</Platform>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="Fellhaven\Fellhaven.csproj" />
-  </ItemGroup>
-</Project>
+<Solution>
+  <Project Path="Fellhaven\Fellhaven.csproj" Type="{9A19103F-16F7-4668-BE54-9A1E7A4F7556}" />
+</Solution>
