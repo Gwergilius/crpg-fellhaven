@@ -1,6 +1,11 @@
-# 001. Graph-Based Dungeon Model
+[adr-002]: 002-platform-strategy.md "Multi-Platform Development Strategy"
+[adr-004]: 004-lua-scripting.md "Lua Scripting for Conditions and Actions"
 
-Date: 2026-05-14
+# ADR-003: Graph-Based Dungeon Model
+
+**Status**: Accepted
+
+**Date**: 2026-05-14
 
 ## Status
 
@@ -178,5 +183,7 @@ GiveItem(gameState, "treasure", 1)
 
 ## Related Decisions
 
-- ADR-002: Lua Scripting Integration
-- ADR-003: Localization System
+- [ADR-001][adr-001]: Engine Choice
+- [ADR-002][adr-002]: Platform Strategy
+- [ADR-004][adr-004]: Lua Scripting Integration
+- [ADR-005][adr-005]: Localization System

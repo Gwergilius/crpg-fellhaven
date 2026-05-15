@@ -1,8 +1,12 @@
-# 002. Lua Scripting for Conditions and Actions
-
 [lua-api]: ../api/lua_api.md "Lua API Reference"
+[adr-003]: 003-graph-based-dungeon.md "Graph-Based Dungeon Model"
+[adr-005]: 005-localization.md "Internationalization Strategy"
 
-Date: 2026-05-14
+# ADR-004: Lua Scripting for Conditions and Actions
+
+**Status**: Accepted
+
+**Date**: 2026-05-14
 
 ## Status
 
@@ -256,5 +260,5 @@ Create unit tests for:
 
 ## Related Decisions
 
-- ADR-001: Graph-Based Dungeon Model (uses Lua for edges)
-- ADR-004: Common Script Library (precompiled frequently-used scripts)
+- [ADR-003][adr-003]: Graph-Based Dungeon Model (uses Lua for edges)
+- ADR-006: Common Script Library (precompiled frequently-used scripts) [TBD]

@@ -1,8 +1,10 @@
 # Fellhaven - Game Design Document
 
-[adr-001]: ../adr/001-graph-based-dungeon.md
-[adr-002]: ../adr/002-lua-scripting.md
-[adr-003]: ../adr/003-localization.md
+[adr-001]: ../adr/001-engine-choice.md
+[adr-002]: ../adr/002-platform-strategy.md
+[adr-003]: ../adr/003-graph-based-dungeon.md
+[adr-004]: ../adr/004-lua-scripting.md
+[adr-005]: ../adr/005-localization.md
 [adr-index]: ../adr/
 
 **Version**: 0.1.0-alpha  

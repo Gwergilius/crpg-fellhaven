@@ -1,6 +1,6 @@
 # Fellhaven Lua API Reference
 
-[adr-002]: ../adr/002-lua-scripting.md "Lua Scripting for Conditions and Actions"
+[adr-004]: ../adr/004-lua-scripting.md "Lua Scripting for Conditions and Actions"
 [graph-format]: graph_format.md "Dungeon Graph Format Specification"
 
 Version: 0.1.0-alpha

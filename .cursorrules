@@ -56,9 +56,11 @@ docs/
 ```
 
 Consult these files for detailed specifications:
-- **docs/adr/001-graph-based-dungeon.md** - Graph model architecture
-- **docs/adr/002-lua-scripting.md** - Lua integration details
-- **docs/adr/003-localization.md** - Localization system
+- **docs/adr/001-engine-choice.md** - Godot 4.4 engine selection
+- **docs/adr/002-platform-strategy.md** - Multi-platform development
+- **docs/adr/003-graph-based-dungeon.md** - Graph model architecture
+- **docs/adr/004-lua-scripting.md** - Lua integration details
+- **docs/adr/005-localization.md** - Localization system
 - **docs/api/lua_api.md** - Complete Lua API reference
 - **docs/api/graph_format.md** - JSON dungeon format specification
 

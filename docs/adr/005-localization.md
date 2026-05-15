@@ -1,6 +1,10 @@
-# 003. Internationalization (i18n) Strategy
+[adr-004]: 004-lua-scripting.md "Lua Scripting for Conditions and Actions"
 
-Date: 2026-05-14
+# ADR-005: Internationalization (i18n) Strategy
+
+**Status**: Accepted
+
+**Date**: 2026-05-14
 
 ## Status
 
@@ -301,5 +305,5 @@ public static void ValidateTranslations()
 
 ## Related Decisions
 
-- ADR-001: Graph-Based Dungeon Model (locations use localization keys)
-- ADR-005: UI Framework (localized UI components)
+- [ADR-003][adr-003]: Graph-Based Dungeon Model (locations use localization keys)
+- ADR-006: UI Framework (localized UI components) [TBD]
