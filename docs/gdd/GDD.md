@@ -1,8 +1,11 @@
 # Fellhaven - Game Design Document
 
-[adr-001]: ../adr/001-graph-based-dungeon.md
-[adr-002]: ../adr/002-lua-scripting.md
-[adr-003]: ../adr/003-localization.md
+[adr-001]: ../adr/001-engine-choice.md
+[adr-002]: ../adr/002-platform-strategy.md
+[adr-003]: ../adr/003-graph-based-dungeon.md
+[adr-004]: ../adr/004-condition-and-combat.md
+[adr-005]: ../adr/005-lua-scripting.md "Event-Action System with Lua Scripting"
+[adr-006]: ../adr/006-localization.md
 [adr-index]: ../adr/
 
 **Version**: 0.1.0-alpha  
@@ -236,7 +239,7 @@ If Attack > Defense:
 
 ### Architecture
 
-**Engine**: Godot 4.4  
+**Engine**: Godot 4.6.2  
 **Language**: 
   - Preferred: C# (.NET 10)
   - Fallback: C# (.NET 8) if Godot doesn't support .NET 10  
@@ -245,15 +248,15 @@ If Attack > Defense:
 **Key Systems**:
 - Graph-based dungeon model ([ADR-001][adr-001])
 - Lua scripting for conditions/actions ([ADR-002][adr-002])
-- JSON-based localization ([ADR-003][adr-003])
+- Key-based localization ([ADR-003][adr-003])
 
 See [Architecture Decision Records][adr-index] for detailed technical decisions.
 
 ### Data Format
 
-**Dungeon Graphs**: JSON files defining locations and edges  
-**Items**: JSON database  
-**Localization**: JSON key-value pairs
+**Source Files**: YAML (preferred) or JSON for world data, items, and localization  
+**Runtime Persistence**: SQLite databases (`world.db` for static data, `save.db` for player progress)  
+**Build Pipeline**: **MazeCompiler** transforms YAML/JSON sources → SQLite databases
 
 ### Performance Targets
 

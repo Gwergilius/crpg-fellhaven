@@ -23,7 +23,7 @@ What actually happened.
 
 ## Environment
 - **OS**: [e.g., Windows 11, macOS 14, Ubuntu 22.04]
-- **Godot Version**: [e.g., 4.4.0]
+- **Godot Version**: [e.g., 4.6.2]
 - **.NET Version**: [e.g., 8.0.1]
 - **Build**: [e.g., Debug/Release, commit hash]
 

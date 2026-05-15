@@ -1,8 +1,12 @@
 # Fellhaven - AI Agent Instructions
 
-[adr-001]: docs/adr/001-graph-based-dungeon.md "Graph-Based Dungeon Model"
-[adr-002]: docs/adr/002-lua-scripting.md "Lua Scripting for Conditions and Actions"
-[adr-003]: docs/adr/003-localization.md "Internationalization Strategy"
+[adr-001]: docs/adr/001-engine-choice.md "Engine Choice"
+[adr-002]: docs/adr/002-platform-strategy.md "Multi-Platform Development Strategy"
+[adr-003]: docs/adr/003-graph-based-dungeon.md "Graph-Based Dungeon Model"
+[adr-004]: docs/adr/004-condition-and-combat.md "Condition Vocabulary and Combat System"
+[adr-005]: docs/adr/005-lua-scripting.md "Event-Action System with Lua Scripting"
+[adr-006]: docs/adr/006-localization.md "Internationalization Strategy"
+[adr-007]: docs/adr/007-3d-rendering-strategy.md "3D Rendering Strategy"
 [location]: src/Fellhaven/scripts/core/Location.cs
 [edge]: src/Fellhaven/scripts/core/Edge.cs
 [gamestate]: src/Fellhaven/scripts/core/GameState.cs
@@ -20,7 +24,7 @@
 [coding-guidelines]: CODING_GUIDELINES.md "Coding Guidelines"
 [cursor-readme]: .cursor/README.md "Cursor IDE Configuration"
 
-Fellhaven is a turn-based fantasy CRPG built with **Godot 4.4** and **C# (.NET 10)**, using a graph-based dungeon model with Lua scripting.
+Fellhaven is a turn-based fantasy CRPG with **isometric/overhead 3D view** built with **Godot 4.6.2** and **C# (.NET 10)**, using a graph-based dungeon model with Lua scripting.
 
 > **Note**: This file contains instructions for GitHub Copilot and Claude. If you're using Cursor IDE, see [.cursor/README.md][cursor-readme] - Cursor has its own `.cursorrules` file that references this document.
 
@@ -37,7 +41,7 @@ dotnet test
 ```
 
 ### Open in Godot
-- Launch Godot 4.4 (.NET version)
+- Launch Godot 4.6.2 (.NET version)
 - Import → `src/Fellhaven/project.godot`
 - Click **Build** (top-right) to generate C# project
 
@@ -50,30 +54,55 @@ dotnet test
 
 ### Core Design Patterns
 
-**Graph-Based Dungeon Model** (see [ADR-001][adr-001]):
+**Graph-Based Dungeon Model** (see [ADR-003][adr-003]):
 - **Nodes** = [Location][location] objects (rooms/areas)
 - **Edges** = [Edge][edge] objects (transitions with conditions)
 - Navigation: Player chooses direction → system finds edges in that direction ordered by `Priority` (lower = higher precedence) → first edge whose Lua condition evaluates `true` is taken
 
-**Lua Scripting** (see [ADR-002][adr-002]):
-- All game logic (conditions, actions) runs in **MoonSharp** (Lua 5.2)
-- **No recompilation needed** for gameplay changes—edit JSON dungeons only
-- Conditions return `bool`, actions modify GameState
-- **Fail-safe**: Lua errors return `false` (deny access), logged but don't crash
+**Condition and Combat System** (see [ADR-004][adr-004]):
+- Unified condition vocabulary for world and combat contexts
+- Dice formula syntax with stat references: `2d10+{DEX}+1`
+- Subject/quantifier system: `party`, `party.any`, `party.all`, `ally`, `enemy`, etc.
+- Logical connectives: `and`, `or`, `not` for composing conditions
 
-**Localization** (see [ADR-003][adr-003]):
-- Key-based system with JSON files: `localization/en.json`, `localization/hu.json`
-- Keys use dot notation: `location.entrance.name`, `msg.door_locked`, `ui.menu.new_game`
+**Event-Action System** (see [ADR-005][adr-005]):
+- **Tier 1**: Finite action vocabulary (C# handlers) for common events
+- **Tier 2**: Lua escape hatch (`execute_script`) for unique puzzles and mods
+- **MoonSharp** (Lua 5.2) for sandboxed scripting
+- **Script-first pattern**: Prototype in Lua, promote to C# if common
+- **No recompilation needed** for content changes—edit YAML/JSON source files only
+- **Fail-safe**: Lua errors logged but don't crash the game
+
+**Localization** (see [ADR-006][adr-006]):
+- **Template-based rendering**: `{placeholder}` syntax for dynamic text composition
+- **No string concatenation**: Only templates + placeholder substitution allowed
+- **Two-tier system**:
+  - Tier 1: JSON files for static UI text (`localization/en.json`, `localization/hu.json`)
+  - Tier 2: YAML `.i18` files bundled with Lua script packages
+- Keys use dot notation: `location.entrance.name`, `msg.item_found`, `ui.menu.new_game`
 - Fallback chain: current language → English → `[MISSING: key]`
+- Parameter substitution: `Tr("msg.item_found", ("item", "Key"), ("location", "Crypt"))`
+
+**3D Rendering Strategy** (see [ADR-007][adr-007]):
+- **Two-tier rendering system**:
+  - **Local maps** (region interiors): Isometric/overhead 3D view with Camera3D
+  - **World map** (region-to-region travel): 2D map with clickable destinations
+- **Isometric 3D** (local): Camera positioned above and angled down (45-60°)
+- **Godot 3D engine**: Camera3D + MeshInstance3D for dungeon geometry
+- **Tactical visibility**: Entire room/region visible (not just one cell)
+- **Grid-based movement**: Discrete cell positions with smooth Tween interpolation
+- **Lighting and atmosphere**: DirectionalLight3D, OmniLight3D, WorldEnvironment
+- **Multi-level support**: Vertical dungeon levels via 3D Y-axis
+- **Classic CRPG pattern**: Follows Fallout 1-2, Baldur's Gate 1-2 approach
 
 ### Key Components
 
 | Class | Pattern | Responsibilities |
 |-------|---------|------------------|
 | [GameState][gamestate] | Godot Singleton | Global flags, variables, inventory, party management |
-| [LocalizationManager][localizationmanager] | Godot Singleton | Translation lookups via `Tr(key)`, runtime language switching |
+| [LocalizationManager][localizationmanager] | Godot Singleton | Template translation via `Tr(key, params)`, placeholder substitution, runtime language switching |
 | [LuaScriptEngine][luascriptengine] | Static Utility | Lua condition/action evaluation via MoonSharp |
-| [DungeonLoader][dungeonloader] | Static Utility | JSON deserialization into Location/Edge graph |
+| [DungeonLoader][dungeonloader] | Static Utility | YAML/JSON deserialization into Location/Edge graph |
 | [Direction][direction] | Enum + Extensions | 8 compass directions + Up/Down, with `GetOpposite()`, `ToShortString()` |
 
 ## Coding Conventions
@@ -153,33 +182,35 @@ public static bool EvaluateCondition(string script, GameState gameState)
 ```
 
 ### Markdown Documentation
-**NEVER use inline links** in Markdown documentation. Always use **reference-style links**:
+**NEVER use inline links** in Markdown documentation. Always use **reference-style links**.
 
-**❌ Incorrect** (inline links):
+**Preferred**: Use **shorthand reference** when the link text matches a suitable reference ID:
 ```markdown
-See the [ADR-001](docs/adr/001-graph-based-dungeon.md) for details.
-Check out [this guide](docs/api/lua_api.md).
+See [ADR-001] for details.
+Check [CODING_GUIDELINES] for code standards.
+
+[ADR-001]: docs/adr/001-engine-choice.md
+[CODING_GUIDELINES]: CODING_GUIDELINES.md
 ```
 
-**✅ Correct** (reference-style links):
+**Alternative**: Use separate reference IDs when link text differs from reference:
 ```markdown
-See the [ADR-001][adr-001] for details.
+See the [graph-based dungeon model][adr-003] for details.
 Check out [this guide][lua-api].
 
 [adr-001]: docs/adr/001-graph-based-dungeon.md "Graph-Based Dungeon Model"
 [lua-api]: docs/api/lua_api.md
 ```
 
-Or use shorthand when title matches the reference ID:
+**❌ Never use inline links**:
 ```markdown
-See [ADR-001] for details.
-
-[ADR-001]: docs/adr/001-graph-based-dungeon.md
+See the [ADR-001](docs/adr/001-engine-choice.md) for details.
+Check out [this guide](docs/api/lua_api.md).
 ```
 
 **Link definitions** must be placed at the **top of the file** (after title/intro). The tooltip part (`"tooltip text"`) is optional but recommended for clarity.
 
-This applies to **both links and images**:
+**Images** follow the same rules:
 ```markdown
 ![Architecture diagram][arch-diagram]
 
@@ -226,18 +257,13 @@ GetPartyLevel(gameState)
 
 ### Action Execution
 All actions on an edge execute **sequentially**, each with optional condition:
-```json
-{
-  "actions": [
-    {
-      "condition_script": "return HasItem(gameState, \"key\")",
-      "action_script": "RemoveItem(gameState, \"key\", 1)\nSetFlag(gameState, \"door_unlocked\", true)"
-    },
-    {
-      "action_script": "GiveItem(gameState, \"xp\", 10)"
-    }
-  ]
-}
+```yaml
+actions:
+  - condition_script: 'return HasItem(gameState, "key")'
+    action_script: |
+      RemoveItem(gameState, "key", 1)
+      SetFlag(gameState, "door_unlocked", true)
+  - action_script: 'GiveItem(gameState, "xp", 10)'
 ```
 
 ## Git Workflow
@@ -280,7 +306,7 @@ test(dungeon): add edge condition evaluation tests
 ## Common Tasks
 
 ### Adding a New Location
-1. Edit dungeon JSON in `data/dungeons/`
+1. Edit dungeon YAML/JSON in `data/dungeons/`
 2. Add location translations to `localization/en.json`, `localization/hu.json`
 3. Define edges with `direction`, `priority`, `condition_script`, `action_script`
 4. Test with `dotnet test` (if unit testable) or in-game
@@ -301,7 +327,7 @@ This project uses **`.slnx`** (Visual Studio 2026+ XML solution format) instead 
 
 ## Dependencies
 
-- **Godot 4.4** (.NET version)
+- **Godot 4.6.2** (.NET version)
 - **.NET 10 SDK** (fallback: .NET 8)
 - **C# 14** (fallback: C# 12)
 - **MoonSharp** (Lua 5.2 implementation for .NET)
@@ -311,4 +337,4 @@ This project uses **`.slnx`** (Visual Studio 2026+ XML solution format) instead 
 
 ---
 
-**Key Principle**: The dungeon graph is **data-driven**—gameplay logic lives in JSON + Lua, not hardcoded C#. When adding features, prefer extending Lua API over C# classes.
+**Key Principle**: The dungeon graph is **data-driven**—gameplay logic lives in YAML/JSON + Lua, not hardcoded C#. When adding features, prefer extending Lua API over C# classes.

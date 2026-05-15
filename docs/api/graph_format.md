@@ -1,7 +1,7 @@
 # Dungeon Graph Format Specification
 
 [lua-api]: lua_api.md "Lua API Reference"
-[adr-001]: ../adr/001-graph-based-dungeon.md "Graph-Based Dungeon Model"
+[adr-003]: ../adr/003-graph-based-dungeon.md "Graph-Based Dungeon Model"
 
 Version: 1.0  
 Date: 2026-05-14

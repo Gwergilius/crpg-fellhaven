@@ -2,7 +2,7 @@
 
 Use this template when creating new Architecture Decision Records.
 
-Copy this file and name it: `NNN-short-title.md` (e.g., `001-graph-based-dungeon.md`)
+Copy this file and name it: `NNN-short-title.md` (e.g., `006-next-decision.md`)
 
 ---
 

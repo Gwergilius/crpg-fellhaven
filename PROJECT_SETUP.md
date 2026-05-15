@@ -41,7 +41,7 @@ The project structure has been successfully created at:
 # Navigate to the project
 cd "D:\OneDrive - Personal\OneDrive\Source\Gwergilius\Fellhaven"
 
-# Open Godot 4.4 and import the project
+# Open Godot 4.6.2 and import the project
 # File > Import > Select: src/Fellhaven/project.godot
 ```
 
@@ -146,4 +146,4 @@ Fellhaven/
 
 **Ready to start development!** 🚀
 
-Open the project in Godot 4.4 and hit that Build button!
+Open the project in Godot 4.6.2 and hit that Build button!

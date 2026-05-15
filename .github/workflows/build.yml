@@ -17,12 +17,12 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '10.0.x'
     
     - name: Setup Godot
       uses: chickensoft-games/setup-godot@v1
       with:
-        version: 4.4.0
+        version: 4.6.2
         use-dotnet: true
     
     - name: Restore dependencies
@@ -49,7 +49,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '10.0.x'
     
     - name: Run dotnet format
       run: dotnet format src/Fellhaven.slnx --verify-no-changes --verbosity diagnostic
