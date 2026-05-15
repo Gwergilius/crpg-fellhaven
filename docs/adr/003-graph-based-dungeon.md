@@ -76,10 +76,6 @@ is a dungeon cell, but the model is not limited to spatial cells.
 | `items` | `ItemSpawn[]` | Items that may be found here (initial spawns) |
 | `encounters` | `EncounterRef?` | Random encounter table for this node |
 
-**Flags representation**: The `flags` field is a `Dictionary<string, bool>` with special
-semantics: getter returns `false` for missing keys; setter deletes keys set to `false`.
-JSON output includes only flags set to `true`.
-
 #### Edge (Transition)
 
 An edge represents a possible transition from one node to another. In the spatial case
@@ -98,8 +94,6 @@ transitions such as stairs, portals, or game-state transitions (death, victory).
 | `on_traverse` | `TraverseEntry[]?` | Ordered list of (condition, action) pairs; first match fires |
 | `on_interact` | `TraverseEntry[]?` | Fired when player interacts with wall face without crossing |
 | `flags` | `EdgeFlags` | `one_way`, `no_spell_pass`, etc. |
-
-**Flags representation**: Same as Node flags — JSON includes only `true` values.
 
 The **condition** and **on_traverse** are separate concerns:
 - `condition` is a **gate**: evaluated first. If it fails, traversal is blocked.
@@ -512,6 +506,44 @@ save.db
 ```
 
 Only NPCs whose state differs from their `world.db` defaults are written to `npc_states`.
+
+## Implementation Details
+
+### Flags Representation
+
+The `flags` field on Node, Edge, and NPC entities uses a specialized data structure:
+
+**Type**: `Dictionary<string, bool>` with special semantics:
+- **Getter**: Returns `false` for missing keys (default value)
+- **Setter**: Deletes keys when set to `false` (sparse storage)
+- **JSON serialization**: Includes only flags set to `true`
+
+**Rationale**:
+- Most flags are `false` most of the time — storing only `true` values saves space
+- The sparse representation makes JSON diffs cleaner (no noise from unchanged flags)
+- Getters defaulting to `false` means code can check flags without null checks
+
+**Example**:
+```json
+// This JSON:
+{ "flags": { "nonMagic": true } }
+
+// Represents:
+{
+  "nonMagic": true,
+  "dark": false,
+  "dangerous": false,
+  "noRecall": false,
+  "outdoor": false
+}
+
+// Empty flags object means all flags are false:
+{ "flags": {} }
+```
+
+**Implementation note**: The underlying storage is effectively a `HashSet<string>` of flag names,
+not a dictionary of bool values. The `Dictionary<string, bool>` type signature is a public API
+convenience that maps cleanly to JSON objects.
 
 ## Alternatives Considered
 
