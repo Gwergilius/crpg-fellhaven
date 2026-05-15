@@ -108,15 +108,6 @@ Navigation works as follows:
    - Move player to `to` node
 4. If no edge condition passes, movement fails
 
-Navigation works as follows:
-1. Player chooses a direction to move
-2. System finds all edges from current node in that direction
-3. For each edge (in definition order):
-   - Evaluate edge's `condition` gate — if false, skip to next edge
-   - If condition passes, execute first matching `on_traverse` entry
-   - Move player to `to` node
-4. If no edge condition passes, movement fails
-
 #### Region
 
 A region is a named grouping of nodes for rendering and data management purposes.
