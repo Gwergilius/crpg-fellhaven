@@ -85,7 +85,7 @@ transitions such as stairs, portals, or game-state transitions (death, victory).
 | Property | Type | Description |
 |---|---|---|
 | `id` | `string` | Unique within the source node, e.g. `"dungeon_entrance:3:5:north"` |
-| `from` | `NodeId` | Source node |
+| `from` | `NodeId` | Source node (navigational property; implicit in YAML via nesting) |
 | `to` | `NodeId` | Destination node. **For solid walls, `to == from` (self-loop)** |
 | `direction` | `Direction?` | `north` \| `east` \| `south` \| `west` \| `up` \| `down` \| `null` (non-spatial) |
 | `state` | `EdgeState` | `open` \| `closed` \| `locked` \| `secret` \| `one_way` \| `solid` |
@@ -114,7 +114,7 @@ A region is a named grouping of nodes for rendering and data management purposes
 
 | Property | Type | Description |
 |---|---|---|
-| `id` | `string` | Unique identifier, e.g. `"sorpigal_town"` |
+| `id` | `string` | Unique identifier, e.g. `"fellhaven_town"` |
 | `name_key` | `string` | i18n key for the display name ([ADR-005][adr-005]) |
 | `type` | `RegionType` | `town` \| `dungeon` \| `outdoor` \| `special` |
 | `width`, `height` | `int` | Grid dimensions (typically ≤ 16×16) |
@@ -131,7 +131,7 @@ not part of any node. This is the **Entity–Location separation** principle.
 
 | Property | Type | Description |
 |---|---|---|
-| `id` | `string` | Globally unique identifier, e.g. `"innkeeper_sorpigal"` |
+| `id` | `string` | Globally unique identifier, e.g. `"innkeeper_fellhaven"` |
 | `home_node_id` | `NodeId` | Default location (initial state) |
 | `schedule` | `ScheduleEntry[]?` | Time-of-day location overrides (optional) |
 | `on_tick` | `ScriptRef?` | Lua script controlling movement/behavior each tick (optional) |
@@ -365,9 +365,13 @@ ends at the same node. The `state` field controls the player experience:
 
 One YAML (preferred) or JSON file per region, stored under `assets/data/dungeons/<region_id>.yaml`.
 
+**Note**: Edges are nested under their source node, making the `from` property implicit in the
+hierarchical source format. **MazeCompiler** transforms this hierarchical structure into a flat
+relational model (SQLite), automatically populating the `from` foreign key for each edge.
+
 ```yaml
-id: sorpigal_town
-name_key: region.sorpigal.name
+id: fellhaven_town
+name_key: region.fellhaven.name
 type: town
 width: 16
 height: 16
@@ -377,7 +381,7 @@ default_encounter_table: null
 music_track: town_theme
 
 nodes:
-  - id: sorpigal:8:3
+  - id: fellhaven:8:3
     x: 8
     y: 3
     type: cell
@@ -386,8 +390,8 @@ nodes:
     items: []
     encounters: null
     edges:
-      - id: sorpigal:8:3:north
-        to: sorpigal:8:2
+      - id: fellhaven:8:3:north
+        to: fellhaven:8:2
         direction: north
         state: open
         wall_visuals:
@@ -397,9 +401,9 @@ nodes:
         flags: {}
 
 npcs:
-  - id: innkeeper_sorpigal
-    name_key: npc.innkeeper_sorpigal.name
-    home_node_id: sorpigal:8:3
+  - id: innkeeper_fellhaven
+    name_key: npc.innkeeper_fellhaven.name
+    home_node_id: fellhaven:8:3
     schedule: null
     on_tick: null
     on_interact:
@@ -410,6 +414,9 @@ npcs:
 ```
 
 ### Compiled SQLite schema
+
+The compiled database uses a **flat relational model**, unlike the hierarchical source format.
+**MazeCompiler** transforms nested edges into independent rows with explicit `from_node` foreign keys.
 
 ```sql
 -- Regions
