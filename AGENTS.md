@@ -23,7 +23,7 @@
 [coding-guidelines]: CODING_GUIDELINES.md "Coding Guidelines"
 [cursor-readme]: .cursor/README.md "Cursor IDE Configuration"
 
-Fellhaven is a turn-based fantasy CRPG built with **Godot 4.4** and **C# (.NET 10)**, using a graph-based dungeon model with Lua scripting.
+Fellhaven is a turn-based fantasy CRPG built with **Godot 4.6.2** and **C# (.NET 10)**, using a graph-based dungeon model with Lua scripting.
 
 > **Note**: This file contains instructions for GitHub Copilot and Claude. If you're using Cursor IDE, see [.cursor/README.md][cursor-readme] - Cursor has its own `.cursorrules` file that references this document.
 
@@ -40,7 +40,7 @@ dotnet test
 ```
 
 ### Open in Godot
-- Launch Godot 4.4 (.NET version)
+- Launch Godot 4.6.2 (.NET version)
 - Import → `src/Fellhaven/project.godot`
 - Click **Build** (top-right) to generate C# project
 
@@ -307,7 +307,7 @@ This project uses **`.slnx`** (Visual Studio 2026+ XML solution format) instead 
 
 ## Dependencies
 
-- **Godot 4.4** (.NET version)
+- **Godot 4.6.2** (.NET version)
 - **.NET 10 SDK** (fallback: .NET 8)
 - **C# 14** (fallback: C# 12)
 - **MoonSharp** (Lua 5.2 implementation for .NET)

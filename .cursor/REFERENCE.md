@@ -26,7 +26,7 @@ Quick reference for important project files that Cursor should consult.
 
 ## Architecture Decision Records
 
-- **`docs/adr/001-engine-choice.md`** - Godot 4.4 engine selection
+- **`docs/adr/001-engine-choice.md`** - Godot 4.6.2 engine selection
 - **`docs/adr/002-platform-strategy.md`** - Multi-platform development
 - **`docs/adr/003-graph-based-dungeon.md`** - Graph model design
 - **`docs/adr/004-lua-scripting.md`** - Lua integration

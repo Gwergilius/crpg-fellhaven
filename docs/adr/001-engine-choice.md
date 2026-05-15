@@ -1,6 +1,6 @@
 [adr-002]: 002-platform-strategy.md
 
-# ADR-001: Choose Godot 4.4 as Game Engine
+# ADR-001: Choose Godot 4.6.2 as Game Engine
 
 **Status**: Accepted
 
@@ -20,7 +20,7 @@ Several engines were evaluated for this use case.
 
 ## Decision
 
-We chose **Godot Engine 4.4** with C# scripting as the primary development platform.
+We chose **Godot Engine 4.6.2** with C# scripting as the primary development platform.
 
 ## Rationale
 

@@ -239,7 +239,7 @@ If Attack > Defense:
 
 ### Architecture
 
-**Engine**: Godot 4.4  
+**Engine**: Godot 4.6.2  
 **Language**: 
   - Preferred: C# (.NET 10)
   - Fallback: C# (.NET 8) if Godot doesn't support .NET 10  

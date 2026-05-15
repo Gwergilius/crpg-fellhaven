@@ -75,4 +75,4 @@ To add a new tool:
 ## Requirements
 
 - .NET 8 SDK
-- Godot 4.4 (for Godot-based tools)
+- Godot 4.6.2 (for Godot-based tools)

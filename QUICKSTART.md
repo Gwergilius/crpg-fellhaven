@@ -15,7 +15,7 @@ Get up and running with Fellhaven development in 10 minutes!
 
 ## Prerequisites
 
-✅ [Godot 4.4][godot-download] (.NET version)  
+✅ [Godot 4.6.2][godot-download] (.NET version)  
 ✅ [.NET 10 SDK][dotnet-download]  
 ✅ [Visual Studio 2026][vs-download] or [VS Code][vscode-download] with C# extension  
 ✅ [Git][git-download]
@@ -33,8 +33,8 @@ cd crpg-fellhaven
 
 ## Step 2: Open in Godot
 
-1. Launch **Godot 4.4**
-2. Click **"Import"**
+1. Launch **Godot 4.6.2**
+2. Click **"Import"
 3. Navigate to `crpg-fellhaven/src/Fellhaven/`
 4. Select `project.godot`
 5. Click **"Import & Edit"**

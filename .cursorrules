@@ -27,7 +27,7 @@ Read and follow ALL guidelines from these project files:
 
 ## Technology Stack
 
-- **Engine**: Godot 4.4 (.NET version)
+- **Engine**: Godot 4.6.2 (.NET version)
 - **Language**: C# with .NET 10 (fallback: .NET 8), C# 14 (fallback: C# 12)
 - **IDE**: Visual Studio 2026 or VS Code
 - **Solution Format**: `.slnx` (Visual Studio 2026+ XML format)
@@ -56,7 +56,7 @@ docs/
 ```
 
 Consult these files for detailed specifications:
-- **docs/adr/001-engine-choice.md** - Godot 4.4 engine selection
+- **docs/adr/001-engine-choice.md** - Godot 4.6.2 engine selection
 - **docs/adr/002-platform-strategy.md** - Multi-platform development
 - **docs/adr/003-graph-based-dungeon.md** - Graph model architecture
 - **docs/adr/004-lua-scripting.md** - Lua integration details

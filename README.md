@@ -11,7 +11,7 @@
 [coding-guidelines]: CODING_GUIDELINES.md
 [license]: LICENSE
 
-A turn-based fantasy CRPG built with Godot 4.4 and C#.
+A turn-based fantasy CRPG built with Godot 4.6.2 and C#.
 
 ## Project Structure
 
@@ -27,7 +27,7 @@ Fellhaven/
 
 ## Tech Stack
 
-- **Engine**: Godot 4.4
+- **Engine**: Godot 4.6.2
 - **Language**: 
   - Preferred: .NET 10 + C# 14
   - Fallback: .NET 8.0 + C# 12 (if Godot doesn't support .NET 10)
@@ -38,7 +38,7 @@ Fellhaven/
 
 ### Prerequisites
 
-- [Godot 4.4 (.NET version)][godot-download]
+- [Godot 4.6.2 (.NET version)][godot-download]
 - [.NET 10 SDK][dotnet-download]
 - Visual Studio 2026 or Visual Studio Code with C# extension
 - **Optional**: [Cursor IDE](https://cursor.sh/) - AI-powered editor with project-specific configuration
@@ -52,7 +52,7 @@ Fellhaven/
    ```
 
 2. Open the Godot project:
-   - Launch Godot 4.4
+   - Launch Godot 4.6.2
    - Click "Import"
    - Navigate to `src/Fellhaven/`
    - Select `project.godot`
