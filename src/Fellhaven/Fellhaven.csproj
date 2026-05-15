@@ -6,6 +6,8 @@
     <LangVersion>14</LangVersion>
     <RootNamespace>Fellhaven</RootNamespace>
     <AssemblyName>Fellhaven</AssemblyName>
+    <!-- Godot project directory for source generators -->
+    <GodotProjectDir>$(MSBuildProjectDirectory)</GodotProjectDir>
   </PropertyGroup>
 
   <ItemGroup>
