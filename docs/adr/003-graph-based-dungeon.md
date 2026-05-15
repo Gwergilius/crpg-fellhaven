@@ -195,8 +195,13 @@ This framing makes several previously implicit behaviours explicit and verifiabl
 ### Partitioning and the grid
 
 The grid is a **rendering and locality constraint**, not a semantic one. Spatial nodes
-carry `(x, y)` coordinates within their region for rendering purposes. Non-spatial nodes
-(terminal states, meta nodes) have no coordinates.
+carry `(x, y)` coordinates within their region for rendering purposes:
+
+- **3D scene rendering**: First-person or isometric view of the current location
+- **Map rendering**: Local maps (automap) and world maps for navigation
+- **Fog-of-war**: Grid coordinates enable spatial visualization of discovered vs. undiscovered areas
+
+Non-spatial nodes (terminal states, meta nodes) have no coordinates.
 
 An edge may connect nodes in **different regions** (e.g., a staircase leads from
 `dungeon_b1:8:0` to `town_entrance:5:7`). There is no requirement that edges stay within a region.
@@ -327,7 +332,7 @@ During development, world data is authored in **YAML** (preferred) or **JSON** s
 
 Two primary tools support this workflow:
 
-**MazeCompiler**:
+**MazeCompiler** (planned):
 - Input: YAML/JSON source files
 - Output: Compiled `world.db` (static game data)
 - Validates schemas, checks referential integrity, optimizes storage
@@ -517,6 +522,7 @@ Every property in `world.db` is classified as either **static** (never changes) 
 | Category | Classification |
 |---|---|
 | Node topology, visual, flags | Static |
+| Node discovery state (fog-of-war) | **Mutable** |
 | Edge topology, wall visuals | Static |
 | Edge state | **Mutable** |
 | Global and map-local flags | **Mutable** |
@@ -537,11 +543,29 @@ save.db
   edge_overrides    — (edge_id, current_state)  where state ≠ initial_state
   flag_overrides    — (flag_id, current_value)  where value ≠ initial_value
   consumed_spawns   — (node_id, item_id)         items already picked up
-  visited_nodes     — (node_id)                  for minimap reveal
+  discovered_nodes  — (node_id, discovery_method) nodes known to the player (fog-of-war)
   npc_states        — (npc_id, current_node_id, alive, flags_json)
 ```
 
 Only NPCs whose state differs from their `world.db` defaults are written to `npc_states`.
+
+#### Node discovery and fog-of-war
+
+The `discovered_nodes` table tracks which nodes the player **knows about**, not just which
+they have visited. A node can become known through multiple means:
+
+- **Physical visit**: Player enters the node (`discovery_method: 'visited'`)
+- **NPC dialogue**: An NPC describes a location (`discovery_method: 'npc_told'`)
+- **Map item**: Player acquires a map showing the area (`discovery_method: 'map_item'`)
+- **Spell or skill**: Revelation magic or scouting skills (`discovery_method: 'spell'`)
+- **Scripted event**: Quest or story progression reveals locations (`discovery_method: 'scripted'`)
+
+Nodes not in `discovered_nodes` are **fogged** (unknown): they do not appear on the player's
+local or world maps. This enables classic fog-of-war gameplay where exploration progressively
+reveals the world.
+
+**Note**: The `discovery_method` field is informational only (for debugging/analytics). The
+presence or absence of a node in `discovered_nodes` is what matters for rendering.
 
 ## Implementation Details
 
