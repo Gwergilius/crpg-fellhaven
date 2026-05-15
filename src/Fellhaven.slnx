@@ -1,6 +1,7 @@
 <Solution>
   <Configurations>
     <BuildType Name="Debug" />
+    <BuildType Name="Release" />
     <BuildType Name="ExportDebug" />
     <BuildType Name="ExportRelease" />
   </Configurations>
