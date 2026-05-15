@@ -585,6 +585,43 @@ has **physically entered**. This determines which description to show:
 **Note**: The `discovery_method` field is informational only (for debugging/analytics). The
 presence or absence of a node in the respective tables is what matters for gameplay.
 
+#### Why separate tables instead of node flags?
+
+**Question**: Why not add `visited` and `discovered` flags to the Node entity itself?
+
+**Answer**: **Player-specific state must live in `save.db`, not `world.db`.**
+
+The architecture maintains a strict separation:
+
+**`world.db` (static game data)**:
+- Defines the world structure, nodes, edges, regions, NPCs
+- **Shared across all players and save slots**
+- Read-only at runtime (never modified by gameplay)
+- Can be updated/patched independently of player saves
+- Version-controlled source of truth compiled from YAML/JSON
+
+**`save.db` (player-specific state)**:
+- Stores **one player's progress** in the world
+- Each save slot has its own `save.db`
+- Tracks which nodes **this specific player** discovered/visited
+- Tracks which items **this player** picked up, which NPCs **this player** killed, etc.
+
+If `visited` and `discovered` were node flags in `world.db`:
+- ❌ Every player would see the same discovered/visited state (unacceptable)
+- ❌ Multiple save slots would interfere with each other
+- ❌ Would need to duplicate the entire `world.db` per save slot (wasteful)
+- ❌ Updating world content would risk corrupting save data
+
+**Separate tables enable**:
+- ✅ **One world.db, many save.db files** (efficient storage)
+- ✅ **Clean separation**: world structure vs. player progress
+- ✅ **Patch safety**: update world.db without touching saves
+- ✅ **Delta snapshot**: only store what changed for this player
+- ✅ **Multiple playthroughs**: each save tracks its own discovery/visitation
+
+This is the same reason `edge_overrides` exists: edge state (open/locked) can change per
+player, so it's stored in `save.db`, not as a mutable property in `world.db`.
+
 ## Implementation Details
 
 ### Flags Representation
